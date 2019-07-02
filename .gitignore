@@ -1,0 +1,4 @@
+RoslynExperiments/packages/*
+RoslynExperiments/.vs/*
+RoslynExperiments/**/bin/*
+RoslynExperiments/**/obj/*
