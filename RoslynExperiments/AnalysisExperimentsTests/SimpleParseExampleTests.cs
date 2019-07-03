@@ -1,4 +1,6 @@
 ﻿using System;
+
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,7 +20,7 @@ namespace AnalysisExperimentsTests
                                   "{\r\n" +
                                   "    public class SomeClass\r\n" +
                                   "    {\r\n" +
-                                  "        public void SomeMethod(int i)\r\n" +
+                                  "        public void SomeMethod(Int32 i)\r\n" +
                                   "        {\r\n" +
                                   "            // Some method body\r\n" +
                                   "        }\r\n" +
@@ -26,9 +28,12 @@ namespace AnalysisExperimentsTests
                                   "}";
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
+            CSharpCompilationOptions options = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
             CSharpCompilation compilation = CSharpCompilation.Create("SimpleParseExample")
                 .AddReferences(MetadataReference.CreateFromFile(typeof(String).Assembly.Location))
-                .AddSyntaxTrees(tree);
+                .AddSyntaxTrees(tree)
+                .WithOptions(options);
+            CheckErrors(compilation);
             SemanticModel model = compilation.GetSemanticModel(tree);
             Console.WriteLine($"root.Kind = {root.Kind()}");
             Console.WriteLine();
@@ -55,6 +60,22 @@ namespace AnalysisExperimentsTests
             Console.WriteLine("Method body:");
             Console.WriteLine(methodDeclaration.Body.ToFullString());
             Console.WriteLine();
+        }
+
+        private void CheckErrors(CSharpCompilation compilation)
+        {
+            IList<Diagnostic> diagnostics = compilation.GetDiagnostics();
+            /*IList<Diagnostic> declarationDiagnostics = compilation.GetDeclarationDiagnostics();
+            IList<Diagnostic> methodDiagnostics = compilation.GetMethodBodyDiagnostics();
+            IList<Diagnostic> parseDiagnostics = compilation.GetParseDiagnostics();*/
+            Boolean hasErrors = false;
+            foreach (Diagnostic diagnostic in diagnostics)
+            {
+                Console.WriteLine($"Diagnostic message: severity = {diagnostic.Severity}, message = \"{diagnostic.GetMessage()}\"");
+                if (diagnostic.Severity == DiagnosticSeverity.Error)
+                    hasErrors = true;
+            }
+            Assert.IsFalse(hasErrors);
         }
     }
 }
