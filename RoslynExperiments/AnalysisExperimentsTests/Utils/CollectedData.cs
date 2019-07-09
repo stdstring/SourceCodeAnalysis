@@ -3,26 +3,26 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace AnalysisExperimentsTests.Utils
 {
-    internal class CollectedIdentifierData : IEquatable<CollectedIdentifierData>
+    internal class CollectedData<T> : IEquatable<CollectedData<T>>
     {
-        public CollectedIdentifierData(String identifier, LinePosition startPosition, LinePosition endPosition)
+        public CollectedData(T data, LinePosition startPosition, LinePosition endPosition)
         {
-            Identifier = identifier;
+            Data = data;
             StartPosition = startPosition;
             EndPosition = endPosition;
         }
 
-        public String Identifier { get; }
+        public T Data { get; }
 
         public LinePosition StartPosition { get; }
 
         public LinePosition EndPosition { get; }
 
-        public Boolean Equals(CollectedIdentifierData other)
+        public Boolean Equals(CollectedData<T> other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return String.Equals(Identifier, other.Identifier) && StartPosition.Equals(other.StartPosition) && EndPosition.Equals(other.EndPosition);
+            return Equals(Data, other.Data) && StartPosition.Equals(other.StartPosition) && EndPosition.Equals(other.EndPosition);
         }
 
         public override Boolean Equals(Object obj)
@@ -30,14 +30,14 @@ namespace AnalysisExperimentsTests.Utils
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((CollectedIdentifierData)obj);
+            return Equals((CollectedData<T>)obj);
         }
 
         public override Int32 GetHashCode()
         {
             unchecked
             {
-                Int32 hashCode = (Identifier != null ? Identifier.GetHashCode() : 0);
+                Int32 hashCode = Data != null ? Data.GetHashCode() : 0;
                 hashCode = (hashCode * 397) ^ StartPosition.GetHashCode();
                 hashCode = (hashCode * 397) ^ EndPosition.GetHashCode();
                 return hashCode;
@@ -46,7 +46,7 @@ namespace AnalysisExperimentsTests.Utils
 
         public override String ToString()
         {
-            return $"CollectedIdentifierData: Identifier = \"{Identifier}\", StartPosition = {StartPosition}, EndPosition = {EndPosition}";
+            return $"CollectedIdentifierData: Data = \"{Data}\", StartPosition = {StartPosition}, EndPosition = {EndPosition}";
         }
     }
 }

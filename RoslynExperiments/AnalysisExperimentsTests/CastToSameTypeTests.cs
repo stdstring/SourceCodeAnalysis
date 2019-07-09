@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AnalysisExperimentsTests.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -27,11 +28,11 @@ namespace AnalysisExperimentsTests
                                   "        }\r\n" +
                                   "    }\r\n" +
                                   "}";
-            CastToSameTypeData[] expectedData =
+            CollectedData<String>[] expectedData =
             {
-                new CastToSameTypeData("string", new LinePosition(7, 24), new LinePosition(7, 34)),
-                new CastToSameTypeData("string", new LinePosition(8, 24), new LinePosition(8, 39)),
-                new CastToSameTypeData("string", new LinePosition(9, 24), new LinePosition(9, 44))
+                new CollectedData<String>("string", new LinePosition(7, 24), new LinePosition(7, 34)),
+                new CollectedData<String>("string", new LinePosition(8, 24), new LinePosition(8, 39)),
+                new CollectedData<String>("string", new LinePosition(9, 24), new LinePosition(9, 44))
             };
             CheckImpl(source, expectedData);
         }
@@ -52,11 +53,11 @@ namespace AnalysisExperimentsTests
                                   "        }\r\n" +
                                   "    }\r\n" +
                                   "}";
-            CastToSameTypeData[] expectedData =
+            CollectedData<String>[] expectedData =
             {
-                new CastToSameTypeData("int", new LinePosition(7, 21), new LinePosition(7, 28)),
-                new CastToSameTypeData("int", new LinePosition(8, 21), new LinePosition(8, 28)),
-                new CastToSameTypeData("int", new LinePosition(9, 21), new LinePosition(9, 35))
+                new CollectedData<String>("int", new LinePosition(7, 21), new LinePosition(7, 28)),
+                new CollectedData<String>("int", new LinePosition(8, 21), new LinePosition(8, 28)),
+                new CollectedData<String>("int", new LinePosition(9, 21), new LinePosition(9, 35))
             };
             CheckImpl(source, expectedData);
         }
@@ -84,7 +85,7 @@ namespace AnalysisExperimentsTests
                                   "        }\r\n" +
                                   "    }\r\n" +
                                   "}";
-            CheckImpl(source, new[] {new CastToSameTypeData("int", new LinePosition(11, 25), new LinePosition(11, 35))});
+            CheckImpl(source, new[] {new CollectedData<String>("int", new LinePosition(11, 25), new LinePosition(11, 35))});
         }
 
         [Test]
@@ -105,7 +106,7 @@ namespace AnalysisExperimentsTests
                                   "        }\r\n" +
                                   "    }\r\n" +
                                   "}";
-            CheckImpl(source, new CastToSameTypeData[0]);
+            CheckImpl(source, new CollectedData<String>[0]);
         }
 
         [Test]
@@ -126,7 +127,7 @@ namespace AnalysisExperimentsTests
                                   "        }\r\n" +
                                   "    }\r\n" +
                                   "}";
-            CheckImpl(source, new CastToSameTypeData[0]);
+            CheckImpl(source, new CollectedData<String>[0]);
         }
 
         [Test]
@@ -155,10 +156,10 @@ namespace AnalysisExperimentsTests
                                   "        }\r\n" +
                                   "    }\r\n" +
                                   "}";
-            CheckImpl(source, new[] {new CastToSameTypeData("SomeNamespace.SomeDerivedClass", new LinePosition(17, 51), new LinePosition(17, 88))});
+            CheckImpl(source, new[] {new CollectedData<String>("SomeNamespace.SomeDerivedClass", new LinePosition(17, 51), new LinePosition(17, 88))});
         }
 
-        private void CheckImpl(String source, CastToSameTypeData[] expectedData)
+        private void CheckImpl(String source, CollectedData<String>[] expectedData)
         {
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
@@ -174,54 +175,12 @@ namespace AnalysisExperimentsTests
         }
     }
 
-    internal class CastToSameTypeData : IEquatable<CastToSameTypeData>
-    {
-        public CastToSameTypeData(String typeName, LinePosition startPosition, LinePosition endPosition)
-        {
-            TypeName = typeName;
-            StartPosition = startPosition;
-            EndPosition = endPosition;
-        }
-
-        public String TypeName { get; }
-
-        public LinePosition StartPosition { get; }
-
-        public LinePosition EndPosition { get; }
-
-        public Boolean Equals(CastToSameTypeData other)
-        {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return String.Equals(TypeName, other.TypeName) && StartPosition.Equals(other.StartPosition) && EndPosition.Equals(other.EndPosition);
-        }
-
-        public override Boolean Equals(Object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return Equals((CastToSameTypeData) obj);
-        }
-
-        public override Int32 GetHashCode()
-        {
-            unchecked
-            {
-                Int32 hashCode = (TypeName != null ? TypeName.GetHashCode() : 0);
-                hashCode = (hashCode * 397) ^ StartPosition.GetHashCode();
-                hashCode = (hashCode * 397) ^ EndPosition.GetHashCode();
-                return hashCode;
-            }
-        }
-    }
-
     internal class CastToSameTypeDetector : CSharpSyntaxWalker
     {
         public CastToSameTypeDetector(SemanticModel model)
         {
             Model = model;
-            Data = new List<CastToSameTypeData>();
+            Data = new List<CollectedData<String>>();
         }
 
         public override void VisitCastExpression(CastExpressionSyntax node)
@@ -232,12 +191,12 @@ namespace AnalysisExperimentsTests
             TypeInfo typeModel = Model.GetTypeInfo(typeSyntax);
             TypeInfo expressionTypeModel = Model.GetTypeInfo(expressionSyntax);
             if (typeModel.Equals(expressionTypeModel))
-                Data.Add(new CastToSameTypeData(typeModel.Type.ToDisplayString(), span.StartLinePosition, span.EndLinePosition));
+                Data.Add(new CollectedData<String>(typeModel.Type.ToDisplayString(), span.StartLinePosition, span.EndLinePosition));
             base.VisitCastExpression(node);
         }
 
         public SemanticModel Model { get; }
 
-        public IList<CastToSameTypeData> Data { get; }
+        public IList<CollectedData<String>> Data { get; }
     }
 }

@@ -102,7 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalysisHelper.cs" />
-    <Compile Include="Utils\CollectedIdentifierData.cs" />
+    <Compile Include="Utils\CollectedData.cs" />
     <Compile Include="IdentifierCheckTests.cs" />
     <Compile Include="IdentifierCollectorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

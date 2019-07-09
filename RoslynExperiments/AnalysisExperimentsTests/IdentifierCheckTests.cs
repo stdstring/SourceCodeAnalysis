@@ -40,7 +40,7 @@ namespace AnalysisExperimentsTests
                                   "        private readonly int _someField;\r\n" +
                                   "    }\r\n" +
                                   "}";
-            CheckImpl(source, new CollectedIdentifierData[0]);
+            CheckImpl(source, new CollectedData<String>[0]);
         }
 
         [Test]
@@ -74,17 +74,17 @@ namespace AnalysisExperimentsTests
                                   "        private readonly int _someField;\r\n" +
                                   "    }\r\n" +
                                   "}";
-            CollectedIdentifierData[] expectedData =
+            CollectedData<String>[] expectedData =
             {
-                new CollectedIdentifierData("TPаrаm1", new LinePosition(4, 36), new LinePosition(4, 43)),
-                new CollectedIdentifierData("SоmеProperty", new LinePosition(7, 12), new LinePosition(7, 24)),
-                new CollectedIdentifierData("SоmеProperty", new LinePosition(17, 19), new LinePosition(17, 31)),
-                new CollectedIdentifierData("локальнаяI", new LinePosition(21, 16), new LinePosition(21, 26))
+                new CollectedData<String>("TPаrаm1", new LinePosition(4, 36), new LinePosition(4, 43)),
+                new CollectedData<String>("SоmеProperty", new LinePosition(7, 12), new LinePosition(7, 24)),
+                new CollectedData<String>("SоmеProperty", new LinePosition(17, 19), new LinePosition(17, 31)),
+                new CollectedData<String>("локальнаяI", new LinePosition(21, 16), new LinePosition(21, 26))
             };
             CheckImpl(source, expectedData);
         }
 
-        private void CheckImpl(String source, CollectedIdentifierData[] expectedData)
+        private void CheckImpl(String source, CollectedData<String>[] expectedData)
         {
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
@@ -105,7 +105,7 @@ namespace AnalysisExperimentsTests
         public BadIdentifiersDetector(SemanticModel model) : base(SyntaxWalkerDepth.Token)
         {
             Model = model;
-            Data = new List<CollectedIdentifierData>();
+            Data = new List<CollectedData<String>>();
             _identifierRegex = new Regex("^[a-zA-Z0-9_]+$");
         }
 
@@ -113,13 +113,13 @@ namespace AnalysisExperimentsTests
         {
             FileLinePositionSpan span = token.SyntaxTree.GetLineSpan(token.Span);
             if (token.Kind() == SyntaxKind.IdentifierToken && !_identifierRegex.IsMatch(token.ValueText))
-                Data.Add(new CollectedIdentifierData(token.ValueText, span.StartLinePosition, span.EndLinePosition));
+                Data.Add(new CollectedData<String>(token.ValueText, span.StartLinePosition, span.EndLinePosition));
             base.VisitToken(token);
         }
 
         public SemanticModel Model { get; }
 
-        public IList<CollectedIdentifierData> Data { get; }
+        public IList<CollectedData<String>> Data { get; }
 
         private readonly Regex _identifierRegex;
     }
