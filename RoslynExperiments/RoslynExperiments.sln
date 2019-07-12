@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoodExample", "Examples\Goo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BadExample", "Examples\BadExample\BadExample.csproj", "{34755E3A-56C8-46DE-987D-840F68F3C5D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceCheckUtil", "SourceCheckUtil\SourceCheckUtil.csproj", "{DAD110FA-ABCC-4466-9C3D-7F5C851A8904}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{34755E3A-56C8-46DE-987D-840F68F3C5D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34755E3A-56C8-46DE-987D-840F68F3C5D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34755E3A-56C8-46DE-987D-840F68F3C5D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DAD110FA-ABCC-4466-9C3D-7F5C851A8904}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAD110FA-ABCC-4466-9C3D-7F5C851A8904}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAD110FA-ABCC-4466-9C3D-7F5C851A8904}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAD110FA-ABCC-4466-9C3D-7F5C851A8904}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
