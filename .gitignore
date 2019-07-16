@@ -1,3 +1,4 @@
+*.user
 RoslynExperiments/packages/*
 RoslynExperiments/.vs/*
 RoslynExperiments/**/bin/*
