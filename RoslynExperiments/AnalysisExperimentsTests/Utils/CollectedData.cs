@@ -46,7 +46,7 @@ namespace AnalysisExperimentsTests.Utils
 
         public override String ToString()
         {
-            return $"CollectedIdentifierData: Data = \"{Data}\", StartPosition = {StartPosition}, EndPosition = {EndPosition}";
+            return $"CollectedData: Data = \"{Data}\", StartPosition = {StartPosition}, EndPosition = {EndPosition}";
         }
     }
 }
