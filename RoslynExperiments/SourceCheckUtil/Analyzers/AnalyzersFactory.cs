@@ -7,7 +7,13 @@ namespace SourceCheckUtil.Analyzers
     {
         public static IList<IFileAnalyzer> Create(TextWriter output)
         {
-            return new List<IFileAnalyzer>();
+            return new IFileAnalyzer[]
+            {
+                new BadFilenameCaseAnalyzer(output),
+                new CastToSameTypeAnalyzer(output),
+                new NonAsciiIdentifiersAnalyzer(output),
+                new VirtualInheritanceAnalyzer(output)
+            };
         }
     }
 }

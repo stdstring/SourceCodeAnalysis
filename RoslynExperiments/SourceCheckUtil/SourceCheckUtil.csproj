@@ -111,12 +111,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analyzers\AnalyzersFactory.cs" />
+    <Compile Include="Analyzers\BadFilenameCaseAnalyzer.cs" />
+    <Compile Include="Analyzers\CastToSameTypeAnalyzer.cs" />
     <Compile Include="Analyzers\IFileAnalyzer.cs" />
+    <Compile Include="Analyzers\NonAsciiIdentifiersAnalyzer.cs" />
+    <Compile Include="Analyzers\VirtualInheritanceAnalyzer.cs" />
     <Compile Include="Processors\FileProcessor.cs" />
     <Compile Include="Processors\ISourceProcessor.cs" />
     <Compile Include="Processors\ProjectProcessor.cs" />
     <Compile Include="Processors\SolutionProcessor.cs" />
     <Compile Include="Processors\SourceProcessorFactory.cs" />
+    <Compile Include="Utils\CollectedData.cs" />
     <Compile Include="Utils\CompilationChecker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

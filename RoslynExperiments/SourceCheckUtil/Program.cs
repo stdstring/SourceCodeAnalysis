@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using SourceCheckUtil.Analyzers;
+using SourceCheckUtil.Processors;
 
 namespace SourceCheckUtil
 {
@@ -21,24 +25,33 @@ namespace SourceCheckUtil
     {
         public static Int32 Main(String[] args)
         {
+            Boolean result = MainImpl(args);
+            return result ? 0 : -1;
+        }
+
+        private static Boolean MainImpl(String[] args)
+        {
             if (IsShowVersion(args))
             {
                 Console.WriteLine(VersionNumber);
-                return 0;
+                return true;
             }
             if (IsShowHelp(args))
             {
                 Console.WriteLine(AppDescription);
-                return 0;
+                return true;
             }
             AppConfig config = TryGetConfig(args);
             if (config != null)
             {
-                return 0;
+                TextWriter output = Console.Out;
+                ISourceProcessor processor = SourceProcessorFactory.Create(config.Source, output);
+                IList<IFileAnalyzer> analyzers = AnalyzersFactory.Create(output);
+                return processor.Process(analyzers);
             }
             Console.WriteLine(BadUsageMessage);
             Console.WriteLine(AppDescription);
-            return -1;
+            return false;
         }
 
         private static Boolean IsShowVersion(String[] args)
@@ -63,8 +76,8 @@ namespace SourceCheckUtil
         }
 
         private const String AppDescription = "Application usage:\r\n" +
-                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj}\r\n" +
-                                              "2. {APP} --source {solution-filename.sln|project-filename.csproj} --config {config-dir}\r\n" +
+                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs}\r\n" +
+                                              "2. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs} --config {config-dir}\r\n" +
                                               "3. {APP} --help\r\n" +
                                               "4. {APP} --version";
         private const String BadUsageMessage = "Bad usage of the application.";
