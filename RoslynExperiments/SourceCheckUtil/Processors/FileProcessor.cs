@@ -19,6 +19,7 @@ namespace SourceCheckUtil.Processors
                 throw new ArgumentNullException(nameof(output));
             _filename = filename;
             _output = output;
+            _processorHelper = new ProcessorHelper(output);
         }
 
         public Boolean Process(IList<IFileAnalyzer> analyzers)
@@ -31,11 +32,7 @@ namespace SourceCheckUtil.Processors
             if (!CompilationChecker.CheckCompilationErrors(compilation, _output))
                 return false;
             SemanticModel model = compilation.GetSemanticModel(tree);
-            Boolean result = true;
-            foreach (IFileAnalyzer analyzer in analyzers)
-            {
-                result &= analyzer.Process(_filename, tree, model);
-            }
+            Boolean result = _processorHelper.ProcessFile(_filename, tree, model, analyzers);
             _output.WriteLine($"Processing of the file {_filename} is finished");
             _output.WriteLine();
             return result;
@@ -55,5 +52,6 @@ namespace SourceCheckUtil.Processors
 
         private readonly String _filename;
         private readonly TextWriter _output;
+        private readonly ProcessorHelper _processorHelper;
     }
 }

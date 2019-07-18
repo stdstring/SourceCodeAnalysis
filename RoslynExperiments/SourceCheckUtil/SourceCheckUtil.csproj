@@ -141,6 +141,7 @@
     <Compile Include="Analyzers\VirtualInheritanceAnalyzer.cs" />
     <Compile Include="Processors\FileProcessor.cs" />
     <Compile Include="Processors\ISourceProcessor.cs" />
+    <Compile Include="Processors\ProcessorHelper.cs" />
     <Compile Include="Processors\ProjectIgnoredFiles.cs" />
     <Compile Include="Processors\ProjectProcessor.cs" />
     <Compile Include="Processors\SolutionProcessor.cs" />

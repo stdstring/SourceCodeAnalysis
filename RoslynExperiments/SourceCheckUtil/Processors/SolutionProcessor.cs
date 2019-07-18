@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using SourceCheckUtil.Analyzers;
-using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Processors
 {
@@ -19,6 +17,7 @@ namespace SourceCheckUtil.Processors
                 throw new ArgumentNullException(nameof(output));
             _solutionFilename = solutionFilename;
             _output = output;
+            _processorHelper = new ProcessorHelper(output);
         }
 
         public Boolean Process(IList<IFileAnalyzer> analyzers)
@@ -41,14 +40,7 @@ namespace SourceCheckUtil.Processors
         {
             _output.WriteLine($"Processing of the project {project.FilePath} is started");
             _output.WriteLine();
-            Compilation compilation = project.GetCompilationAsync().Result;
-            if (!CompilationChecker.CheckCompilationErrors(compilation, _output))
-                return false;
-            Boolean result = true;
-            foreach (Document file in project.Documents.Where(doc => doc.SourceCodeKind == SourceCodeKind.Regular && !ProjectIgnoredFiles.IgnoreFile(doc.FilePath)))
-            {
-                result &= Process(file, compilation, analyzers);
-            }
+            Boolean result = _processorHelper.ProcessProject(project, analyzers, Process);
             _output.WriteLine($"Processing of the project {project.FilePath} is finished");
             _output.WriteLine();
             return result;
@@ -56,15 +48,11 @@ namespace SourceCheckUtil.Processors
 
         private Boolean Process(Document file, Compilation compilation, IList<IFileAnalyzer> analyzers)
         {
-            Boolean result = true;
             _output.WriteLine($"Processing of the file {file.FilePath} is started");
             _output.WriteLine();
             SyntaxTree tree = file.GetSyntaxTreeAsync().Result;
             SemanticModel model = compilation.GetSemanticModel(tree);
-            foreach (IFileAnalyzer analyzer in analyzers)
-            {
-                result &= analyzer.Process(file.FilePath, tree, model);
-            }
+            Boolean result = _processorHelper.ProcessFile(file.FilePath, tree, model, analyzers);
             _output.WriteLine($"Processing of the file {file.FilePath} is finished");
             _output.WriteLine();
             return result;
@@ -72,5 +60,6 @@ namespace SourceCheckUtil.Processors
 
         private readonly String _solutionFilename;
         private readonly TextWriter _output;
+        private readonly ProcessorHelper _processorHelper;
     }
 }
