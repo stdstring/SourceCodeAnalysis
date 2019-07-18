@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using SourceCheckUtil.Analyzers;
@@ -40,7 +41,7 @@ namespace SourceCheckUtil.Processors
             if (!CompilationChecker.CheckCompilationErrors(compilation, _output))
                 return false;
             Boolean result = true;
-            foreach (Document file in project.Documents)
+            foreach (Document file in project.Documents.Where(doc => doc.SourceCodeKind == SourceCodeKind.Regular && !ProjectIgnoredFiles.IgnoreFile(doc.FilePath)))
             {
                 result &= Process(file, compilation, analyzers);
             }
