@@ -23,7 +23,8 @@ namespace SourceCheckUtil.Processors
 
         public Boolean Process(IList<IFileAnalyzer> analyzers)
         {
-            _output.WriteLine($"Processing file {_filename}");
+            _output.WriteLine($"Processing of the file {_filename} is started");
+            _output.WriteLine();
             String source = File.ReadAllText(_filename);
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             Compilation compilation = CreateCompilation(tree);
@@ -35,6 +36,8 @@ namespace SourceCheckUtil.Processors
             {
                 result &= analyzer.Process(_filename, tree, model);
             }
+            _output.WriteLine($"Processing of the file {_filename} is finished");
+            _output.WriteLine();
             return result;
         }
 

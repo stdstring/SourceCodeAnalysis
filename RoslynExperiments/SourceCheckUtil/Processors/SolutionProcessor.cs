@@ -23,7 +23,8 @@ namespace SourceCheckUtil.Processors
 
         public Boolean Process(IList<IFileAnalyzer> analyzers)
         {
-            _output.WriteLine($"Processing solution {_solutionFilename}");
+            _output.WriteLine($"Processing of the solution {_solutionFilename} is started");
+            _output.WriteLine();
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
             Solution solution = workspace.OpenSolutionAsync(_solutionFilename).Result;
             Boolean result = true;
@@ -31,12 +32,15 @@ namespace SourceCheckUtil.Processors
             {
                 result &= Process(project, analyzers);
             }
+            _output.WriteLine($"Processing of the solution {_solutionFilename} is finished");
+            _output.WriteLine();
             return result;
         }
 
         private Boolean Process(Project project, IList<IFileAnalyzer> analyzers)
         {
-            _output.WriteLine($"Processing project {project.FilePath}");
+            _output.WriteLine($"Processing of the project {project.FilePath} is started");
+            _output.WriteLine();
             Compilation compilation = project.GetCompilationAsync().Result;
             if (!CompilationChecker.CheckCompilationErrors(compilation, _output))
                 return false;
@@ -45,19 +49,24 @@ namespace SourceCheckUtil.Processors
             {
                 result &= Process(file, compilation, analyzers);
             }
+            _output.WriteLine($"Processing of the project {project.FilePath} is finished");
+            _output.WriteLine();
             return result;
         }
 
         private Boolean Process(Document file, Compilation compilation, IList<IFileAnalyzer> analyzers)
         {
             Boolean result = true;
-            _output.WriteLine($"Processing file {file.FilePath}");
+            _output.WriteLine($"Processing of the file {file.FilePath} is started");
+            _output.WriteLine();
             SyntaxTree tree = file.GetSyntaxTreeAsync().Result;
             SemanticModel model = compilation.GetSemanticModel(tree);
             foreach (IFileAnalyzer analyzer in analyzers)
             {
                 result &= analyzer.Process(file.FilePath, tree, model);
             }
+            _output.WriteLine($"Processing of the file {file.FilePath} is finished");
+            _output.WriteLine();
             return result;
         }
 

@@ -26,6 +26,7 @@ namespace SourceCheckUtil.Analyzers
             Boolean hasErrors = ProcessErrors(detector.Data);
             ProcessWarnings(detector.Data);
             _output.WriteLine($"Execution of CastToSameTypeAnalyzer finished");
+            _output.WriteLine();
             return !hasErrors;
         }
 

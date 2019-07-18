@@ -23,7 +23,8 @@ namespace SourceCheckUtil.Processors
 
         public Boolean Process(IList<IFileAnalyzer> analyzers)
         {
-            _output.WriteLine($"Processing project {_projectFilename}");
+            _output.WriteLine($"Processing of the project {_projectFilename} is started");
+            _output.WriteLine();
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
             Project project = workspace.OpenProjectAsync(_projectFilename).Result;
             Compilation compilation = project.GetCompilationAsync().Result;
@@ -34,19 +35,24 @@ namespace SourceCheckUtil.Processors
             {
                 result &= Process(file, compilation, analyzers);
             }
+            _output.WriteLine($"Processing of the project {_projectFilename} is finished");
+            _output.WriteLine();
             return result;
         }
 
         private Boolean Process(Document file, Compilation compilation, IList<IFileAnalyzer> analyzers)
         {
             Boolean result = true;
-            _output.WriteLine($"Processing file {file.FilePath}");
+            _output.WriteLine($"Processing of the file {file.FilePath} is started");
+            _output.WriteLine();
             SyntaxTree tree = file.GetSyntaxTreeAsync().Result;
             SemanticModel model = compilation.GetSemanticModel(tree);
             foreach (IFileAnalyzer analyzer in analyzers)
             {
                 result &= analyzer.Process(file.FilePath, tree, model);
             }
+            _output.WriteLine($"Processing of the file {file.FilePath} is finished");
+            _output.WriteLine();
             return result;
         }
 

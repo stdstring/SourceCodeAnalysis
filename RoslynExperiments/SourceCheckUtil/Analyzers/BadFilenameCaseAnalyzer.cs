@@ -25,6 +25,7 @@ namespace SourceCheckUtil.Analyzers
             collector.Visit(tree.GetRoot());
             Boolean result = Process(filename, collector.Data);
             _output.WriteLine($"Execution of BadFilenameCaseAnalyzer finished");
+            _output.WriteLine();
             return result;
         }
 
@@ -46,7 +47,7 @@ namespace SourceCheckUtil.Analyzers
                 _output.WriteLine($"[WARNING]: File {filename} doesn't contain any types with names corresponding to the name of this file");
                 return true;
             }
-            if (!exactMatch && typeWrongNameCaseList.Count == 0)
+            if (!exactMatch && typeWrongNameCaseList.Count > 0)
             {
                 _output.WriteLine($"File {filename} doesn't contain any type with name exact match to the filename, but contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
                 foreach (CollectedData<String> typeWrongNameCase in typeWrongNameCaseList)

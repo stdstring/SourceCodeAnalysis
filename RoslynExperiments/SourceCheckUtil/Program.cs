@@ -47,7 +47,9 @@ namespace SourceCheckUtil
                 TextWriter output = Console.Out;
                 ISourceProcessor processor = SourceProcessorFactory.Create(config.Source, output);
                 IList<IFileAnalyzer> analyzers = AnalyzersFactory.Create(output);
-                return processor.Process(analyzers);
+                Boolean processResult = processor.Process(analyzers);
+                output.WriteLine($"Result of analysis: analysis is {(processResult ? "succeeded" : "failed")}");
+                return processResult;
             }
             Console.WriteLine(BadUsageMessage);
             Console.WriteLine(AppDescription);

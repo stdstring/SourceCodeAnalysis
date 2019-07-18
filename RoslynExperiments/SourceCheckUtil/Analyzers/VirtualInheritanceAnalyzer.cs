@@ -22,12 +22,13 @@ namespace SourceCheckUtil.Analyzers
             _output.WriteLine($"Execution of VirtualInheritanceAnalyzer started");
             VirtualInterfaceInheritanceDetector detector = new VirtualInterfaceInheritanceDetector(model);
             detector.Visit(tree.GetRoot());
-            Boolean hasErrors = Process(detector.Data);
+            Boolean hasErrors = ProcessErrors(detector.Data);
             _output.WriteLine($"Execution of VirtualInheritanceAnalyzer finished");
+            _output.WriteLine();
             return !hasErrors;
         }
 
-        private Boolean Process(IList<String> errors)
+        private Boolean ProcessErrors(IList<String> errors)
         {
             Console.WriteLine($"Found {errors.Count} base non-system interfaces not marked for virtual inheritance in the ported C++ code");
             foreach (String error in errors)
