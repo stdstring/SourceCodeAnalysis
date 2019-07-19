@@ -44,16 +44,6 @@ namespace SourceCheckUtil
             }
         }
 
-        private static Boolean IsShowVersion(String[] args)
-        {
-            return args.Length == 1 && String.Equals("--version", args[0]);
-        }
-
-        private static Boolean IsShowHelp(String[] args)
-        {
-            return (args.Length == 0) || (args.Length == 1 && String.Equals("--help", args[0]));
-        }
-
         private const String AppDescription = "Application usage:\r\n" +
                                               "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs}\r\n [--config {config-dir}\r\n] [--verbose]" +
                                               "2. {APP} --help\r\n" +
