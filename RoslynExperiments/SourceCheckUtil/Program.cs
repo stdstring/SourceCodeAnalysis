@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SourceCheckUtil.Analyzers;
 using SourceCheckUtil.Config;
+using SourceCheckUtil.ExternalConfig;
 using SourceCheckUtil.Processors;
 using SourceCheckUtil.Utils;
 
@@ -29,7 +30,8 @@ namespace SourceCheckUtil
                 case AppUsageMode.Analysis:
                     AnalysisConfig analysisConfig = new AnalysisConfig(config);
                     OutputImpl output = new OutputImpl(Console.Out, Console.Error, analysisConfig.Verbose);
-                    ISourceProcessor processor = SourceProcessorFactory.Create(analysisConfig.Source, output);
+                    IExternalConfig externalConfig = ExternalConfigFactory.Create(analysisConfig.Config);
+                    ISourceProcessor processor = SourceProcessorFactory.Create(analysisConfig.Source, externalConfig, output);
                     IList<IFileAnalyzer> analyzers = AnalyzersFactory.Create(output);
                     Boolean processResult = processor.Process(analyzers);
                     output.WriteOutputLine($"Result of analysis: analysis is {(processResult ? "succeeded" : "failed")}");
