@@ -113,18 +113,14 @@ namespace SourceCheckUtil.Analyzers
             private Boolean IsSystemType(INamedTypeSymbol type)
             {
                 // TODO (std_string) : think about approach
-                return type.ToDisplayString().StartsWith(SystemPrefix);
+                return type.ToDisplayString().StartsWith(ImplDefs.SystemPrefix);
             }
 
             // TODO (std_string) : probably move into extension methods
             private Boolean HasVirtualInheritanceAttr(INamedTypeSymbol type)
             {
-                return type.GetAttributes().Any(attr => String.Equals(attr.AttributeClass.ToDisplayString(), VirtualInheritanceAttribute));
+                return type.GetAttributes().Any(attr => String.Equals(attr.AttributeClass.ToDisplayString(), ImplDefs.VirtualInheritanceAttribute));
             }
-
-            private const String SystemPrefix = "System.";
-
-            private const String VirtualInheritanceAttribute = "CsToCppPorter.CppVirtualInheritance";
         }
     }
 }
