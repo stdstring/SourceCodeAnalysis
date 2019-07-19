@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Analyzers
 {
     internal class VirtualInheritanceAnalyzer : IFileAnalyzer
     {
-        public VirtualInheritanceAnalyzer(TextWriter output)
+        public VirtualInheritanceAnalyzer(OutputImpl output)
         {
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
@@ -19,26 +19,26 @@ namespace SourceCheckUtil.Analyzers
 
         public Boolean Process(String filename, SyntaxTree tree, SemanticModel model)
         {
-            _output.WriteLine($"Execution of VirtualInheritanceAnalyzer started");
+            _output.WriteOutputLine($"Execution of VirtualInheritanceAnalyzer started");
             VirtualInterfaceInheritanceDetector detector = new VirtualInterfaceInheritanceDetector(model);
             detector.Visit(tree.GetRoot());
             Boolean hasErrors = ProcessErrors(detector.Data);
-            _output.WriteLine($"Execution of VirtualInheritanceAnalyzer finished");
-            _output.WriteLine();
+            _output.WriteOutputLine($"Execution of VirtualInheritanceAnalyzer finished");
+            _output.WriteOutputLine();
             return !hasErrors;
         }
 
         private Boolean ProcessErrors(IList<String> errors)
         {
-            Console.WriteLine($"Found {errors.Count} base non-system interfaces not marked for virtual inheritance in the ported C++ code");
+            _output.WriteOutputLine($"Found {errors.Count} base non-system interfaces not marked for virtual inheritance in the ported C++ code");
             foreach (String error in errors)
             {
-                Console.WriteLine($"[ERROR]: Found base non-system interface named {error} not marked for virtual inheritance in the ported C++ code");
+                _output.WriteErrorLine($"[ERROR]: Found base non-system interface named {error} not marked for virtual inheritance in the ported C++ code");
             }
             return errors.Count > 0;
         }
 
-        private readonly TextWriter _output;
+        private readonly OutputImpl _output;
 
         private class VirtualInterfaceInheritanceDetector : CSharpSyntaxWalker
         {

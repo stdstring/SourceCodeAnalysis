@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -11,7 +10,7 @@ namespace SourceCheckUtil.Analyzers
 {
     internal class CastToSameTypeAnalyzer : IFileAnalyzer
     {
-        public CastToSameTypeAnalyzer(TextWriter output)
+        public CastToSameTypeAnalyzer(OutputImpl output)
         {
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
@@ -20,23 +19,23 @@ namespace SourceCheckUtil.Analyzers
 
         public Boolean Process(String filename, SyntaxTree tree, SemanticModel model)
         {
-            _output.WriteLine($"Execution of CastToSameTypeAnalyzer started");
+            _output.WriteOutputLine($"Execution of CastToSameTypeAnalyzer started");
             CastToSameTypeDetector detector = new CastToSameTypeDetector(model);
             detector.Visit(tree.GetRoot());
             Boolean hasErrors = ProcessErrors(detector.Data);
             ProcessWarnings(detector.Data);
-            _output.WriteLine($"Execution of CastToSameTypeAnalyzer finished");
-            _output.WriteLine();
+            _output.WriteOutputLine($"Execution of CastToSameTypeAnalyzer finished");
+            _output.WriteOutputLine();
             return !hasErrors;
         }
 
         private Boolean ProcessErrors(IList<CollectedData<String>> data)
         {
             IList<CollectedData<String>> errors = data.Where(item => _errorCastTypes.Contains(item.Data)).ToList();
-            Console.WriteLine($"Found {errors.Count} casts leading to errors in the ported C++ code");
+            _output.WriteOutputLine($"Found {errors.Count} casts leading to errors in the ported C++ code");
             foreach (CollectedData<String> error in errors)
             {
-                Console.WriteLine($"[ERROR]: Found cast to the same type {error.Data} which are started at {error.StartPosition} and finished at {error.EndPosition}");
+                _output.WriteErrorLine($"[ERROR]: Found cast to the same type {error.Data} which are started at {error.StartPosition} and finished at {error.EndPosition}");
             }
             return errors.Count > 0;
         }
@@ -44,14 +43,14 @@ namespace SourceCheckUtil.Analyzers
         private void ProcessWarnings(IList<CollectedData<String>> data)
         {
             IList<CollectedData<String>> warnings = data.Where(item => !_errorCastTypes.Contains(item.Data)).ToList();
-            Console.WriteLine($"Found {warnings.Count} casts to the same type not leading to errors in the ported C++ code");
+            _output.WriteOutputLine($"Found {warnings.Count} casts to the same type not leading to errors in the ported C++ code");
             foreach (CollectedData<String> warning in warnings)
             {
-                Console.WriteLine($"[WARNING]: Found cast to the same type {warning.Data} which are started at {warning.StartPosition} and finished at {warning.EndPosition}");
+                _output.WriteOutputLine($"[WARNING]: Found cast to the same type {warning.Data} which are started at {warning.StartPosition} and finished at {warning.EndPosition}");
             }
         }
 
-        private readonly TextWriter _output;
+        private readonly OutputImpl _output;
 
         private readonly String[] _errorCastTypes = {"string", "System.String"};
 

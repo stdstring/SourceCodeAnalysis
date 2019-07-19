@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -10,7 +9,7 @@ namespace SourceCheckUtil.Analyzers
 {
     internal class NonAsciiIdentifiersAnalyzer : IFileAnalyzer
     {
-        public NonAsciiIdentifiersAnalyzer(TextWriter output)
+        public NonAsciiIdentifiersAnalyzer(OutputImpl output)
         {
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
@@ -19,27 +18,27 @@ namespace SourceCheckUtil.Analyzers
 
         public Boolean Process(String filename, SyntaxTree tree, SemanticModel model)
         {
-            _output.WriteLine($"Execution of NonAsciiIdentifiersAnalyzer started");
+            _output.WriteOutputLine($"Execution of NonAsciiIdentifiersAnalyzer started");
             Regex identifierRegex = new Regex("^[a-zA-Z0-9_]+$");
             NonConsistentIdentifiersDetector detector = new NonConsistentIdentifiersDetector(model, identifierRegex);
             detector.Visit(tree.GetRoot());
             Boolean hasErrors = ProcessErrors(detector.Data);
-            _output.WriteLine($"Execution of NonAsciiIdentifiersAnalyzer finished");
-            _output.WriteLine();
+            _output.WriteOutputLine($"Execution of NonAsciiIdentifiersAnalyzer finished");
+            _output.WriteOutputLine();
             return !hasErrors;
         }
 
         private Boolean ProcessErrors(IList<CollectedData<String>> errors)
         {
-            Console.WriteLine($"Found {errors.Count} non-ASCII identifiers leading to errors in the ported C++ code");
+            _output.WriteOutputLine($"Found {errors.Count} non-ASCII identifiers leading to errors in the ported C++ code");
             foreach (CollectedData<String> error in errors)
             {
-                Console.WriteLine($"[ERROR]: Found the following non-ASCII identifier \"{error.Data}\" which are started at {error.StartPosition} and finished at {error.EndPosition}");
+                _output.WriteErrorLine($"[ERROR]: Found the following non-ASCII identifier \"{error.Data}\" which are started at {error.StartPosition} and finished at {error.EndPosition}");
             }
             return errors.Count > 0;
         }
 
-        private readonly TextWriter _output;
+        private readonly OutputImpl _output;
 
         private class NonConsistentIdentifiersDetector : CSharpSyntaxWalker
         {

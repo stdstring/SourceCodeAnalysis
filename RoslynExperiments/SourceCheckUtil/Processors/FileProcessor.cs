@@ -11,7 +11,7 @@ namespace SourceCheckUtil.Processors
 {
     internal class FileProcessor : ISourceProcessor
     {
-        public FileProcessor(String filename, TextWriter output)
+        public FileProcessor(String filename, OutputImpl output)
         {
             if (String.IsNullOrEmpty(filename))
                 throw new ArgumentNullException(nameof(filename));
@@ -24,8 +24,8 @@ namespace SourceCheckUtil.Processors
 
         public Boolean Process(IList<IFileAnalyzer> analyzers)
         {
-            _output.WriteLine($"Processing of the file {_filename} is started");
-            _output.WriteLine();
+            _output.WriteOutputLine($"Processing of the file {_filename} is started");
+            _output.WriteOutputLine();
             String source = File.ReadAllText(_filename);
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             Compilation compilation = CreateCompilation(tree);
@@ -33,8 +33,8 @@ namespace SourceCheckUtil.Processors
                 return false;
             SemanticModel model = compilation.GetSemanticModel(tree);
             Boolean result = _processorHelper.ProcessFile(_filename, tree, model, analyzers);
-            _output.WriteLine($"Processing of the file {_filename} is finished");
-            _output.WriteLine();
+            _output.WriteOutputLine($"Processing of the file {_filename} is finished");
+            _output.WriteOutputLine();
             return result;
         }
 
@@ -51,7 +51,7 @@ namespace SourceCheckUtil.Processors
         }
 
         private readonly String _filename;
-        private readonly TextWriter _output;
+        private readonly OutputImpl _output;
         private readonly ProcessorHelper _processorHelper;
     }
 }

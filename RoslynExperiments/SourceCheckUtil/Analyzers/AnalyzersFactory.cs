@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.IO;
+using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Analyzers
 {
     internal static class AnalyzersFactory
     {
-        public static IList<IFileAnalyzer> Create(TextWriter output)
+        public static IList<IFileAnalyzer> Create(OutputImpl output)
         {
             return new IFileAnalyzer[]
             {

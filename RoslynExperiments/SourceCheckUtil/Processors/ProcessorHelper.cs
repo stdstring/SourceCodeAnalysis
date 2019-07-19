@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using SourceCheckUtil.Analyzers;
@@ -10,7 +9,7 @@ namespace SourceCheckUtil.Processors
 {
     internal class ProcessorHelper
     {
-        public ProcessorHelper(TextWriter output)
+        public ProcessorHelper(OutputImpl output)
         {
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
@@ -40,6 +39,6 @@ namespace SourceCheckUtil.Processors
             return result;
         }
 
-        private readonly TextWriter _output;
+        private readonly OutputImpl _output;
     }
 }

@@ -11,7 +11,7 @@ namespace SourceCheckUtil.Analyzers
 {
     internal class BadFilenameCaseAnalyzer : IFileAnalyzer
     {
-        public BadFilenameCaseAnalyzer(TextWriter output)
+        public BadFilenameCaseAnalyzer(OutputImpl output)
         {
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
@@ -20,12 +20,12 @@ namespace SourceCheckUtil.Analyzers
 
         public Boolean Process(String filename, SyntaxTree tree, SemanticModel model)
         {
-            _output.WriteLine($"Execution of BadFilenameCaseAnalyzer started");
+            _output.WriteOutputLine($"Execution of BadFilenameCaseAnalyzer started");
             TopLevelTypeNamesCollector collector = new TopLevelTypeNamesCollector(model);
             collector.Visit(tree.GetRoot());
             Boolean result = Process(filename, collector.Data);
-            _output.WriteLine($"Execution of BadFilenameCaseAnalyzer finished");
-            _output.WriteLine();
+            _output.WriteOutputLine($"Execution of BadFilenameCaseAnalyzer finished");
+            _output.WriteOutputLine();
             return result;
         }
 
@@ -44,27 +44,27 @@ namespace SourceCheckUtil.Analyzers
             }
             if (!exactMatch && typeWrongNameCaseList.Count == 0)
             {
-                _output.WriteLine($"[WARNING]: File {filename} doesn't contain any types with names corresponding to the name of this file");
+                _output.WriteOutputLine($"[WARNING]: File {filename} doesn't contain any types with names corresponding to the name of this file");
                 return true;
             }
             if (!exactMatch && typeWrongNameCaseList.Count > 0)
             {
-                _output.WriteLine($"File {filename} doesn't contain any type with name exact match to the filename, but contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
+                _output.WriteOutputLine($"File {filename} doesn't contain any type with name exact match to the filename, but contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
                 foreach (CollectedData<String> typeWrongNameCase in typeWrongNameCaseList)
                 {
-                    _output.WriteLine($"[ERROR]: File {filename} contains type named {typeWrongNameCase.Data} with name match to the filename with ignoring case");
+                    _output.WriteErrorLine($"[ERROR]: File {filename} contains type named {typeWrongNameCase.Data} with name match to the filename with ignoring case");
                 }
                 return false;
             }
-            _output.WriteLine($"File {filename} contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
+            _output.WriteOutputLine($"File {filename} contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
             foreach (CollectedData<String> typeWrongNameCase in typeWrongNameCaseList)
             {
-                _output.WriteLine($"[WARNING]: File {filename} contains type named {typeWrongNameCase.Data} with name match to the filename with ignoring case");
+                _output.WriteOutputLine($"[WARNING]: File {filename} contains type named {typeWrongNameCase.Data} with name match to the filename with ignoring case");
             }
             return true;
         }
 
-        private readonly TextWriter _output;
+        private readonly OutputImpl _output;
 
         internal class TopLevelTypeNamesCollector : CSharpSyntaxWalker
         {
