@@ -19,7 +19,7 @@ namespace SourceCheckUtil.Processors
         public Boolean ProcessProject(Project project, IList<IFileAnalyzer> analyzers, Func<Document, Compilation, IList<IFileAnalyzer>, Boolean> fileProcessor)
         {
             Compilation compilation = project.GetCompilationAsync().Result;
-            if (!CompilationChecker.CheckCompilationErrors(compilation, _output))
+            if (!CompilationChecker.CheckCompilationErrors(project.FilePath, compilation, _output))
                 return false;
             Boolean result = true;
             foreach (Document file in project.Documents.Where(doc => doc.SourceCodeKind == SourceCodeKind.Regular && !ProjectIgnoredFiles.IgnoreFile(doc.FilePath)))

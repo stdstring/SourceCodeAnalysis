@@ -29,7 +29,7 @@ namespace SourceCheckUtil.Processors
             String source = File.ReadAllText(_filename);
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             Compilation compilation = CreateCompilation(tree);
-            if (!CompilationChecker.CheckCompilationErrors(compilation, _output))
+            if (!CompilationChecker.CheckCompilationErrors(_filename, compilation, _output))
                 return false;
             SemanticModel model = compilation.GetSemanticModel(tree);
             Boolean result = _processorHelper.ProcessFile(_filename, tree, model, analyzers);

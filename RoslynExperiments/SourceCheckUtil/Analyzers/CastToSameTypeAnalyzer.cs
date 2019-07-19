@@ -22,20 +22,20 @@ namespace SourceCheckUtil.Analyzers
             _output.WriteOutputLine($"Execution of CastToSameTypeAnalyzer started");
             CastToSameTypeDetector detector = new CastToSameTypeDetector(model);
             detector.Visit(tree.GetRoot());
-            Boolean hasErrors = ProcessErrors(detector.Data);
+            Boolean hasErrors = ProcessErrors(filename, detector.Data);
             ProcessWarnings(detector.Data);
             _output.WriteOutputLine($"Execution of CastToSameTypeAnalyzer finished");
             _output.WriteOutputLine();
             return !hasErrors;
         }
 
-        private Boolean ProcessErrors(IList<CollectedData<String>> data)
+        private Boolean ProcessErrors(String filename, IList<CollectedData<String>> data)
         {
             IList<CollectedData<String>> errors = data.Where(item => _errorCastTypes.Contains(item.Data)).ToList();
             _output.WriteOutputLine($"Found {errors.Count} casts leading to errors in the ported C++ code");
             foreach (CollectedData<String> error in errors)
             {
-                _output.WriteErrorLine($"[ERROR]: Found cast to the same type {error.Data} which are started at {error.StartPosition} and finished at {error.EndPosition}");
+                _output.WriteErrorLine($"[ERROR]: {filename} file contains the cast to the same type {error.Data} which are started at {error.StartPosition} and finished at {error.EndPosition}");
             }
             return errors.Count > 0;
         }

@@ -22,18 +22,18 @@ namespace SourceCheckUtil.Analyzers
             Regex identifierRegex = new Regex("^[a-zA-Z0-9_]+$");
             NonConsistentIdentifiersDetector detector = new NonConsistentIdentifiersDetector(model, identifierRegex);
             detector.Visit(tree.GetRoot());
-            Boolean hasErrors = ProcessErrors(detector.Data);
+            Boolean hasErrors = ProcessErrors(filename, detector.Data);
             _output.WriteOutputLine($"Execution of NonAsciiIdentifiersAnalyzer finished");
             _output.WriteOutputLine();
             return !hasErrors;
         }
 
-        private Boolean ProcessErrors(IList<CollectedData<String>> errors)
+        private Boolean ProcessErrors(String filename, IList<CollectedData<String>> errors)
         {
             _output.WriteOutputLine($"Found {errors.Count} non-ASCII identifiers leading to errors in the ported C++ code");
             foreach (CollectedData<String> error in errors)
             {
-                _output.WriteErrorLine($"[ERROR]: Found the following non-ASCII identifier \"{error.Data}\" which are started at {error.StartPosition} and finished at {error.EndPosition}");
+                _output.WriteErrorLine($"[ERROR]: {filename} file contains the following non-ASCII identifier \"{error.Data}\" which are started at {error.StartPosition} and finished at {error.EndPosition}");
             }
             return errors.Count > 0;
         }

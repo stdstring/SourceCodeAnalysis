@@ -44,22 +44,22 @@ namespace SourceCheckUtil.Analyzers
             }
             if (!exactMatch && typeWrongNameCaseList.Count == 0)
             {
-                _output.WriteOutputLine($"[WARNING]: File {filename} doesn't contain any types with names corresponding to the name of this file");
+                _output.WriteOutputLine($"[WARNING]: File doesn't contain any types with names corresponding to the name of this file");
                 return true;
             }
             if (!exactMatch && typeWrongNameCaseList.Count > 0)
             {
-                _output.WriteOutputLine($"File {filename} doesn't contain any type with name exact match to the filename, but contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
+                _output.WriteOutputLine($"File doesn't contain any type with name exact match to the filename, but contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
                 foreach (CollectedData<String> typeWrongNameCase in typeWrongNameCaseList)
                 {
                     _output.WriteErrorLine($"[ERROR]: File {filename} contains type named {typeWrongNameCase.Data} with name match to the filename with ignoring case");
                 }
                 return false;
             }
-            _output.WriteOutputLine($"File {filename} contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
+            _output.WriteOutputLine($"File contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
             foreach (CollectedData<String> typeWrongNameCase in typeWrongNameCaseList)
             {
-                _output.WriteOutputLine($"[WARNING]: File {filename} contains type named {typeWrongNameCase.Data} with name match to the filename with ignoring case");
+                _output.WriteOutputLine($"[WARNING]: File contains type named {typeWrongNameCase.Data} with name match to the filename with ignoring case");
             }
             return true;
         }
