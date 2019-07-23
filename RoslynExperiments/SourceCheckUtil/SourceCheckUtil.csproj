@@ -146,6 +146,7 @@
     <Compile Include="ExternalConfig\EmptyExternalConfig.cs" />
     <Compile Include="ExternalConfig\ExternalConfigFactory.cs" />
     <Compile Include="ExternalConfig\IExternalConfig.cs" />
+    <Compile Include="ExternalConfig\PorterExternalConfig.cs" />
     <Compile Include="Processors\FileProcessor.cs" />
     <Compile Include="Processors\ISourceProcessor.cs" />
     <Compile Include="Processors\ProcessorHelper.cs" />

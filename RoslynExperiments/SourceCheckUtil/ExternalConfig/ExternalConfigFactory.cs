@@ -6,7 +6,9 @@ namespace SourceCheckUtil.ExternalConfig
     {
         public static IExternalConfig Create(String config)
         {
-            return new EmptyExternalConfig();
+            if (String.IsNullOrEmpty(config))
+                return new EmptyExternalConfig();
+            return new PorterExternalConfig(config);
         }
     }
 }
