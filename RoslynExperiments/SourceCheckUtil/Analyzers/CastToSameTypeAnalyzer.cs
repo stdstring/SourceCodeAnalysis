@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using SourceCheckUtil.ExternalConfig;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Analyzers
@@ -17,7 +18,7 @@ namespace SourceCheckUtil.Analyzers
             _output = output;
         }
 
-        public Boolean Process(String filename, SyntaxTree tree, SemanticModel model)
+        public Boolean Process(String filename, SyntaxTree tree, SemanticModel model, ExternalConfigData externalData)
         {
             _output.WriteOutputLine($"Execution of CastToSameTypeAnalyzer started");
             CastToSameTypeDetector detector = new CastToSameTypeDetector(model);

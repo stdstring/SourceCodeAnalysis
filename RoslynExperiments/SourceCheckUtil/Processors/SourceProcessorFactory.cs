@@ -22,9 +22,9 @@ namespace SourceCheckUtil.Processors
 
         private static readonly IDictionary<String, Func<String, IExternalConfig, OutputImpl, ISourceProcessor>> ProcessorsMap = new Dictionary<String, Func<String, IExternalConfig, OutputImpl, ISourceProcessor>>
         {
-            {".sln", (source, config, output) => new SolutionProcessor(source, output)},
-            {".csproj", (source, config, output) => new ProjectProcessor(source, output)},
-            {".cs", (source, config, output) => new FileProcessor(source, output)}
+            {".sln", (source, config, output) => new SolutionProcessor(source, config, output)},
+            {".csproj", (source, config, output) => new ProjectProcessor(source, config, output)},
+            {".cs", (source, config, output) => new FileProcessor(source, config, output)}
         };
     }
 }

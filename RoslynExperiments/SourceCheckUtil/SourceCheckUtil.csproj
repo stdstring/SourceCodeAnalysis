@@ -148,10 +148,11 @@
     <Compile Include="ExternalConfig\IExternalConfig.cs" />
     <Compile Include="ExternalConfig\PorterExternalConfig.cs" />
     <Compile Include="Processors\FileProcessor.cs" />
+    <Compile Include="Processors\FileProcessorHelper.cs" />
     <Compile Include="Processors\ISourceProcessor.cs" />
-    <Compile Include="Processors\ProcessorHelper.cs" />
     <Compile Include="Processors\ProjectIgnoredFiles.cs" />
     <Compile Include="Processors\ProjectProcessor.cs" />
+    <Compile Include="Processors\ProjectProcessorHelper.cs" />
     <Compile Include="Processors\SolutionProcessor.cs" />
     <Compile Include="Processors\SourceProcessorFactory.cs" />
     <Compile Include="Utils\CollectedData.cs" />

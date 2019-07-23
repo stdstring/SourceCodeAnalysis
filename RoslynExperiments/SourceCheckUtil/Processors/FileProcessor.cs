@@ -5,21 +5,25 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SourceCheckUtil.Analyzers;
+using SourceCheckUtil.ExternalConfig;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Processors
 {
     internal class FileProcessor : ISourceProcessor
     {
-        public FileProcessor(String filename, OutputImpl output)
+        public FileProcessor(String filename, IExternalConfig externalConfig, OutputImpl output)
         {
             if (String.IsNullOrEmpty(filename))
                 throw new ArgumentNullException(nameof(filename));
+            if (externalConfig == null)
+                throw new ArgumentNullException(nameof(externalConfig));
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
             _filename = filename;
+            _externalConfig = externalConfig;
             _output = output;
-            _processorHelper = new ProcessorHelper(output);
+            _processorHelper = new FileProcessorHelper();
         }
 
         public Boolean Process(IList<IFileAnalyzer> analyzers)
@@ -32,7 +36,7 @@ namespace SourceCheckUtil.Processors
             if (!CompilationChecker.CheckCompilationErrors(_filename, compilation, _output))
                 return false;
             SemanticModel model = compilation.GetSemanticModel(tree);
-            Boolean result = _processorHelper.ProcessFile(_filename, tree, model, analyzers);
+            Boolean result = _processorHelper.Process(_filename, tree, model, analyzers, _externalConfig.LoadDefault());
             _output.WriteOutputLine($"Processing of the file {_filename} is finished");
             _output.WriteOutputLine();
             return result;
@@ -51,7 +55,8 @@ namespace SourceCheckUtil.Processors
         }
 
         private readonly String _filename;
+        private readonly IExternalConfig _externalConfig;
         private readonly OutputImpl _output;
-        private readonly ProcessorHelper _processorHelper;
+        private readonly FileProcessorHelper _processorHelper;
     }
 }
