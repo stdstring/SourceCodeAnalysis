@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BadExample", "Examples\BadE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceCheckUtil", "SourceCheckUtil\SourceCheckUtil.csproj", "{DAD110FA-ABCC-4466-9C3D-7F5C851A8904}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SourceCheckUtilTests", "SourceCheckUtilTests\SourceCheckUtilTests.csproj", "{3055A209-D058-435F-8A06-EEC91A6C3783}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{DAD110FA-ABCC-4466-9C3D-7F5C851A8904}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAD110FA-ABCC-4466-9C3D-7F5C851A8904}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAD110FA-ABCC-4466-9C3D-7F5C851A8904}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3055A209-D058-435F-8A06-EEC91A6C3783}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3055A209-D058-435F-8A06-EEC91A6C3783}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3055A209-D058-435F-8A06-EEC91A6C3783}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3055A209-D058-435F-8A06-EEC91A6C3783}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

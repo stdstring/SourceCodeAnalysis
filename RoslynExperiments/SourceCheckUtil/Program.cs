@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using SourceCheckUtil.Analyzers;
 using SourceCheckUtil.Config;
 using SourceCheckUtil.ExternalConfig;
@@ -29,6 +30,7 @@ namespace SourceCheckUtil
                     return true;
                 case AppUsageMode.Analysis:
                     AnalysisConfig analysisConfig = new AnalysisConfig(config);
+                    Console.OutputEncoding = Encoding.UTF8;
                     OutputImpl output = new OutputImpl(Console.Out, Console.Error, analysisConfig.Verbose);
                     IExternalConfig externalConfig = ExternalConfigFactory.Create(analysisConfig.Config);
                     ISourceProcessor processor = SourceProcessorFactory.Create(analysisConfig.Source, externalConfig, output);
