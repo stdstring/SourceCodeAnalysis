@@ -120,7 +120,7 @@ namespace SourceCheckUtil.Analyzers
             // TODO (std_string) : probably move into extension methods
             private Boolean HasVirtualInheritanceAttr(INamedTypeSymbol type)
             {
-                return type.GetAttributes().Any(attr => String.Equals(attr.AttributeClass.ToDisplayString(), ImplDefs.VirtualInheritanceAttribute));
+                return type.GetAttributes().Any(attr => String.Equals(attr.AttributeClass.Name, ImplDefs.VirtualInheritanceAttribute));
             }
         }
     }

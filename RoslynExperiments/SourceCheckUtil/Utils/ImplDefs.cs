@@ -6,6 +6,6 @@ namespace SourceCheckUtil.Utils
     {
         public const String SystemPrefix = "System.";
 
-        public const String VirtualInheritanceAttribute = "CsToCppPorter.CppVirtualInheritance";
+        public const String VirtualInheritanceAttribute = "CppVirtualInheritance";
     }
 }
