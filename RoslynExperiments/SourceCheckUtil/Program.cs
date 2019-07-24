@@ -49,7 +49,7 @@ namespace SourceCheckUtil
         }
 
         private const String AppDescription = "Application usage:\r\n" +
-                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs}\r\n [--config {config-dir}\r\n] [--verbose]" +
+                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config {config-dir}] [--verbose]\r\n" +
                                               "2. {APP} --help\r\n" +
                                               "3. {APP} --version";
         private const String BadUsageMessage = "Bad usage of the application.";

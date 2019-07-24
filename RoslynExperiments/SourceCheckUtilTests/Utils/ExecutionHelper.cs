@@ -25,15 +25,21 @@ namespace SourceCheckUtilTests.Utils
 
     internal static class ExecutionHelper
     {
-        public static ExecutionResult Execute(String target, String config = null, Boolean verbose = false)
+        public static ExecutionResult Execute(String target, String config, Boolean verbose)
         {
             if (String.IsNullOrEmpty(target))
                 throw new ArgumentNullException(nameof(target));
+            String arguments = CreateArgList(target, config, verbose);
+            return Execute(arguments);
+        }
+
+        public static ExecutionResult Execute(String arguments)
+        {
             using (Process utilProcess = new Process())
             {
                 String currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
                 utilProcess.StartInfo.FileName = Path.Combine(currentDir, UtilFilename);
-                utilProcess.StartInfo.Arguments = CreateArgList(target, config, verbose);
+                utilProcess.StartInfo.Arguments = arguments;
                 utilProcess.StartInfo.UseShellExecute = false;
                 utilProcess.StartInfo.CreateNoWindow = true;
                 utilProcess.StartInfo.RedirectStandardError = true;

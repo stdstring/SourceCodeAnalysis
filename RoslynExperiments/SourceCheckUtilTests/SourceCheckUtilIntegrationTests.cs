@@ -10,16 +10,51 @@ namespace SourceCheckUtilTests
     public class SourceCheckUtilIntegrationTests
     {
         [Test]
-        public void ProcessGoodExample()
+        public void ProcessEmptyArgs()
         {
-            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj");
+            ExecutionResult executionResult = ExecutionHelper.Execute("");
+            CheckExecutionResult(executionResult, 0, AppDescription, "");
+        }
+
+        [Test]
+        public void ProcessHelp()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("--help");
+            CheckExecutionResult(executionResult, 0, AppDescription, "");
+        }
+
+        [Test]
+        public void ProcessVersion()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("--version");
+            CheckExecutionResult(executionResult, 0, "0.1\r\n", "");
+        }
+
+        [Test]
+        public void ProcessUnknownArg()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("--some-strange-option");
+            CheckExecutionResult(executionResult, -1, BadUsageMessage + AppDescription, "");
+        }
+
+        [Test]
+        public void ProcessAnalysisUnknownArg()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("--source \"..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj\" --some-strange-option");
+            CheckExecutionResult(executionResult, -1, BadUsageMessage + AppDescription, "");
+        }
+
+        [Test]
+        public void ProcessGoodExampleAnalysis()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj", null, false);
             CheckExecutionResult(executionResult, 0, "", "");
         }
 
         [Test]
-        public void ProcessBadExample()
+        public void ProcessBadExampleAnalysis()
         {
-            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\BadExample\\BadExample.csproj");
+            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\BadExample\\BadExample.csproj", null, false);
             const String expectedErrorTemplate = "[ERROR]: {0}\\CastsExample.cs file contains the cast to the same type string which are started at 25,28 and finished at 25,44\r\n" +
                                                  "[ERROR]: File {0}\\ClassnameExample.cs contains type named BadExample.ClassNameExample with name match to the filename with ignoring case\r\n" +
                                                  "[ERROR]: File {0}\\ClassnameExample.cs contains type named BadExample.Classnameexample with name match to the filename with ignoring case\r\n" +
@@ -52,5 +87,11 @@ namespace SourceCheckUtilTests
             Assert.AreEqual(outputData, result.OutputData);
             Assert.AreEqual(errorData, result.ErrorData);
         }
+
+        private const String BadUsageMessage = "Bad usage of the application.\r\n";
+        private const String AppDescription = "Application usage:\r\n" +
+                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config {config-dir}] [--verbose]\r\n" +
+                                              "2. {APP} --help\r\n" +
+                                              "3. {APP} --version\r\n";
     }
 }
