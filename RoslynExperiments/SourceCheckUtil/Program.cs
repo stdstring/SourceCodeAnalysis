@@ -33,6 +33,11 @@ namespace SourceCheckUtil
                     Console.OutputEncoding = Encoding.UTF8;
                     OutputImpl output = new OutputImpl(Console.Out, Console.Error, analysisConfig.Verbose);
                     IExternalConfig externalConfig = ExternalConfigFactory.Create(analysisConfig.Config);
+                    if (externalConfig == null)
+                    {
+                        output.WriteErrorLine($"[ERROR]: Bad (unknown) config {analysisConfig.Config}");
+                        return false;
+                    }
                     ISourceProcessor processor = SourceProcessorFactory.Create(analysisConfig.Source, externalConfig, output);
                     IList<IFileAnalyzer> analyzers = AnalyzersFactory.Create(output);
                     Boolean processResult = processor.Process(analyzers);
@@ -49,7 +54,7 @@ namespace SourceCheckUtil
         }
 
         private const String AppDescription = "Application usage:\r\n" +
-                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config {config-dir}] [--verbose]\r\n" +
+                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config {config-file|config-dir}] [--verbose]\r\n" +
                                               "2. {APP} --help\r\n" +
                                               "3. {APP} --version";
         private const String BadUsageMessage = "Bad usage of the application.";

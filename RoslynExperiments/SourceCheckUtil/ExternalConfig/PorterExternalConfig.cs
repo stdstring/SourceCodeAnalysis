@@ -10,7 +10,8 @@ namespace SourceCheckUtil.ExternalConfig
     {
         public PorterExternalConfig(String config)
         {
-            CheckConfig(config);
+            if (!CheckConfig(config))
+                throw new FileNotFoundException(config);
             _configDir = IsDirectory(config) ? config : Path.GetDirectoryName(config);
             _configFilename = IsFile(config) ? config : Path.Combine(config, DefaultConfigName);
         }
@@ -36,18 +37,18 @@ namespace SourceCheckUtil.ExternalConfig
             return ExternalConfigData.Merge(new ExternalConfigData(attributes), configs);
         }
 
-        private void CheckConfig(String config)
+        public static Boolean CheckConfig(String config)
         {
             if (String.IsNullOrEmpty(config))
                 throw new ArgumentNullException(nameof(config));
             if (IsFile(config))
-                return;
+                return true;
             if (IsDirectory(config) && IsFile(Path.Combine(config, DefaultConfigName)))
-                return;
-            throw new FileNotFoundException(config);
+                return true;
+            return false;
         }
 
-        // TODO (std_string) : think about non-recursive version of thix impl
+        // TODO (std_string) : think about non-recursive version of this impl
         private ExternalConfigData LoadImpl(String importName)
         {
             // TODO (std_string) : we must know how to process case when importName will be relative to porter directory (if 'use_porter_home_directory_while_resolving_path' option is enabled)
@@ -82,13 +83,13 @@ namespace SourceCheckUtil.ExternalConfig
         }
 
         // TODO (std_string) : probably move this into the specialized place
-        private Boolean IsDirectory(String path)
+        private static Boolean IsDirectory(String path)
         {
             return Directory.Exists(path);
         }
 
         // TODO (std_string) : probably move this into the specialized place
-        private Boolean IsFile(String path)
+        private static Boolean IsFile(String path)
         {
             return File.Exists(path);
         }

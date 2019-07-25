@@ -30,6 +30,11 @@ namespace SourceCheckUtil.Processors
         {
             _output.WriteOutputLine($"Processing of the file {_filename} is started");
             _output.WriteOutputLine();
+            if (!File.Exists(_filename))
+            {
+                _output.WriteErrorLine($"[ERROR]: Bad (unknown) target {_filename}");
+                return false;
+            }
             String source = File.ReadAllText(_filename);
             SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
             Compilation compilation = CreateCompilation(tree);

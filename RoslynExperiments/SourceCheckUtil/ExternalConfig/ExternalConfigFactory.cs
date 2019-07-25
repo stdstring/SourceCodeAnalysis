@@ -8,7 +8,7 @@ namespace SourceCheckUtil.ExternalConfig
         {
             if (String.IsNullOrEmpty(config))
                 return new EmptyExternalConfig();
-            return new PorterExternalConfig(config);
+            return PorterExternalConfig.CheckConfig(config) ? new PorterExternalConfig(config) : null;
         }
     }
 }

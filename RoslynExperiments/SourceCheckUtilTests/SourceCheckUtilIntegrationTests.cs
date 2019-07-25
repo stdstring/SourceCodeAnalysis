@@ -45,14 +45,28 @@ namespace SourceCheckUtilTests
         }
 
         [Test]
-        public void ProcessGoodExampleAnalysis()
+        public void ProcessAnalysisForUnknownSource()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("SomeUnknownExample.csproj", null, false);
+            CheckExecutionResult(executionResult, -1, "", "[ERROR]: Bad (unknown) target SomeUnknownExample.csproj\r\n");
+        }
+
+        [Test]
+        public void ProcessAnalysisForUnknownConfig()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj", "..\\SomeConfig.config", false);
+            CheckExecutionResult(executionResult, -1, "", "[ERROR]: Bad (unknown) config ..\\SomeConfig.config\r\n");
+        }
+
+        [Test]
+        public void ProcessGoodExampleProjectAnalysis()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj", null, false);
             CheckExecutionResult(executionResult, 0, "", "");
         }
 
         [Test]
-        public void ProcessBadExampleAnalysis()
+        public void ProcessBadExampleProjectAnalysis()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\BadExample\\BadExample.csproj", null, false);
             const String expectedErrorTemplate = "[ERROR]: {0}\\CastsExample.cs file contains the cast to the same type string which are started at 25,28 and finished at 25,44\r\n" +
@@ -90,7 +104,7 @@ namespace SourceCheckUtilTests
 
         private const String BadUsageMessage = "Bad usage of the application.\r\n";
         private const String AppDescription = "Application usage:\r\n" +
-                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config {config-dir}] [--verbose]\r\n" +
+                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config {config-file|config-dir}] [--verbose]\r\n" +
                                               "2. {APP} --help\r\n" +
                                               "3. {APP} --version\r\n";
     }

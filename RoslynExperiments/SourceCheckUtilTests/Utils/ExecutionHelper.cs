@@ -64,7 +64,7 @@ namespace SourceCheckUtilTests.Utils
             StringBuilder dest = new StringBuilder();
             dest.AppendFormat("--source \"{0}\"", target);
             if (!String.IsNullOrEmpty(config))
-                dest.AppendFormat(" --config \"{0}\"", target);
+                dest.AppendFormat(" --config \"{0}\"", config);
             if (verbose)
                 dest.Append(" --verbose");
             return dest.ToString();

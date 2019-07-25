@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using SourceCheckUtil.Analyzers;
@@ -28,6 +29,11 @@ namespace SourceCheckUtil.Processors
             _output.WriteOutputLine($"Processing of the solution {_solutionFilename} is started");
             _output.WriteOutputLine();
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
+            if (!File.Exists(_solutionFilename))
+            {
+                _output.WriteErrorLine($"[ERROR]: Bad (unknown) target {_solutionFilename}");
+                return false;
+            }
             Solution solution = workspace.OpenSolutionAsync(_solutionFilename).Result;
             Boolean result = true;
             foreach (Project project in solution.Projects)
