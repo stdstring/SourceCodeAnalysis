@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Build.Locator;
 using SourceCheckUtil.ExternalConfig;
 using SourceCheckUtil.Utils;
 
@@ -17,6 +18,7 @@ namespace SourceCheckUtil.Processors
             String sourceExtension = Path.GetExtension(source);
             if (String.IsNullOrEmpty(sourceExtension) || !ProcessorsMap.ContainsKey(sourceExtension))
                 throw new ArgumentException(nameof(source));
+            MSBuildLocator.RegisterDefaults();
             return ProcessorsMap[sourceExtension](source, externalConfig, output);
         }
 
