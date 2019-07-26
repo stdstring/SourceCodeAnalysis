@@ -94,6 +94,20 @@ namespace SourceCheckUtilTests
             CheckExecutionResult(executionResult, -1, "", expectedError);
         }
 
+        [Test]
+        public void ProcessSolutionWithDependenciesBetweenProjectsAnalysis()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\LibraryDependenciesExample\\LibraryDependenciesExample.sln", null, false);
+            CheckExecutionResult(executionResult, 0, "", "");
+        }
+
+        [Test]
+        public void ProcessProjectWithDependenciesAnalysis()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\LibraryDependenciesExample\\DependentLibrary\\DependentLibrary.csproj", null, false);
+            CheckExecutionResult(executionResult, 0, "", "");
+        }
+
         private void CheckExecutionResult(ExecutionResult result, Int32 exitCode, String outputData, String errorData)
         {
             Assert.IsNotNull(result);

@@ -1,5 +1,5 @@
 *.user
 RoslynExperiments/packages/*
-RoslynExperiments/.vs/*
+RoslynExperiments/**/.vs/*
 RoslynExperiments/**/bin/*
 RoslynExperiments/**/obj/*
