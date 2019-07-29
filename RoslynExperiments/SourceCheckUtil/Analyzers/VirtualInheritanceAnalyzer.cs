@@ -29,24 +29,38 @@ namespace SourceCheckUtil.Analyzers
             return !hasErrors;
         }
 
-        private Boolean ProcessErrors(String filename, IList<String> errors)
+        private Boolean ProcessErrors(String filename, IList<VirtualInterfaceInheritanceData> errors)
         {
             _output.WriteOutputLine($"Found {errors.Count} base non-system interfaces not marked for virtual inheritance in the ported C++ code");
-            foreach (String error in errors)
+            foreach (VirtualInterfaceInheritanceData error in errors)
             {
-                _output.WriteErrorLine($"[ERROR]: {filename} file contains type which implements base non-system interface named {error} not marked for virtual inheritance in the ported C++ code");
+                String baseInterfaces = String.Join(", ", error.BaseInterfaces);
+                _output.WriteErrorLine($"[ERROR]: {filename} file contains {error.Type} type which implements the following base non-system interfaces not marked for virtual inheritance in the ported C++ code: {baseInterfaces}");
             }
             return errors.Count > 0;
         }
 
         private readonly OutputImpl _output;
 
+        private class VirtualInterfaceInheritanceData
+        {
+            public VirtualInterfaceInheritanceData(String type, IList<String> baseInterfaces)
+            {
+                Type = type;
+                BaseInterfaces = baseInterfaces;
+            }
+
+            public String Type { get; }
+
+            public IList<String> BaseInterfaces { get; }
+        }
+
         private class VirtualInterfaceInheritanceDetector : CSharpSyntaxWalker
         {
             public VirtualInterfaceInheritanceDetector(SemanticModel model)
             {
                 Model = model;
-                Data = new List<String>();
+                Data = new List<VirtualInterfaceInheritanceData>();
             }
 
             public override void VisitClassDeclaration(ClassDeclarationSyntax node)
@@ -54,7 +68,7 @@ namespace SourceCheckUtil.Analyzers
                 INamedTypeSymbol type = Model.GetDeclaredSymbol(node);
                 IList<INamedTypeSymbol> baseInterfaces = new List<INamedTypeSymbol>();
                 CollectBaseInterfaces(type.Interfaces, baseInterfaces);
-                ProcessBaseInterfaces(baseInterfaces);
+                ProcessBaseInterfaces(type, baseInterfaces);
                 base.VisitClassDeclaration(node);
             }
 
@@ -63,7 +77,7 @@ namespace SourceCheckUtil.Analyzers
                 INamedTypeSymbol type = Model.GetDeclaredSymbol(node);
                 IList<INamedTypeSymbol> baseInterfaces = new List<INamedTypeSymbol>();
                 CollectBaseInterfaces(type.Interfaces, baseInterfaces);
-                ProcessBaseInterfaces(baseInterfaces);
+                ProcessBaseInterfaces(type, baseInterfaces);
                 base.VisitStructDeclaration(node);
             }
 
@@ -72,13 +86,13 @@ namespace SourceCheckUtil.Analyzers
                 INamedTypeSymbol type = Model.GetDeclaredSymbol(node);
                 IList<INamedTypeSymbol> baseInterfaces = new List<INamedTypeSymbol>();
                 CollectBaseInterfaces(type, baseInterfaces);
-                ProcessBaseInterfaces(baseInterfaces);
+                ProcessBaseInterfaces(type, baseInterfaces);
                 base.VisitInterfaceDeclaration(node);
             }
 
             public SemanticModel Model { get; }
 
-            public IList<String> Data { get; }
+            public IList<VirtualInterfaceInheritanceData> Data { get; }
 
             // TODO (std_string) : create non-recursive version
             private void CollectBaseInterfaces(IList<INamedTypeSymbol> symbols, IList<INamedTypeSymbol> dest)
@@ -94,7 +108,7 @@ namespace SourceCheckUtil.Analyzers
                 CollectBaseInterfaces(symbol.Interfaces, dest);
             }
 
-            private void ProcessBaseInterfaces(IList<INamedTypeSymbol> baseInterfaces)
+            private void ProcessBaseInterfaces(INamedTypeSymbol thisType, IList<INamedTypeSymbol> baseInterfaces)
             {
                 IList<INamedTypeSymbol> systemBaseInterfaces = baseInterfaces.Where(IsSystemType).ToList();
                 IList<INamedTypeSymbol> nonSystemBaseInterfaces = baseInterfaces.Where(i => !IsSystemType(i)).ToList();
@@ -102,12 +116,15 @@ namespace SourceCheckUtil.Analyzers
                     return;
                 if (systemBaseInterfaces.Count == 0 && nonSystemBaseInterfaces.Count == 1)
                     return;
+                IList<String> dest = new List<String>();
                 foreach (INamedTypeSymbol type in nonSystemBaseInterfaces.Where(i => !HasVirtualInheritanceAttr(i)))
                 {
                     String typename = type.ToDisplayString();
-                    if (!Data.Contains(typename))
-                        Data.Add(typename);
+                    if (!dest.Contains(typename))
+                        dest.Add(typename);
                 }
+                if (dest.Count > 0)
+                    Data.Add(new VirtualInterfaceInheritanceData(thisType.ToDisplayString(), dest));
             }
 
             // TODO (std_string) : probably move into extension methods
