@@ -36,7 +36,7 @@ namespace SourceCheckUtil.Analyzers
             _output.WriteOutputLine($"Found {errors.Count} casts leading to errors in the ported C++ code");
             foreach (CollectedData<String> error in errors)
             {
-                _output.WriteErrorLine($"[ERROR]: {filename} file contains the cast to the same type {error.Data} which are started at {error.StartPosition} and finished at {error.EndPosition}");
+                _output.WriteErrorLine($"[ERROR]: File {filename} contains the cast to the same type {error.Data} which are started at {error.StartPosition} and finished at {error.EndPosition}");
             }
             return errors.Count > 0;
         }
@@ -59,7 +59,7 @@ namespace SourceCheckUtil.Analyzers
         {
             public CastToSameTypeDetector(SemanticModel model)
             {
-                Model = model;
+                _model = model;
                 Data = new List<CollectedData<String>>();
             }
 
@@ -68,16 +68,16 @@ namespace SourceCheckUtil.Analyzers
                 FileLinePositionSpan span = node.SyntaxTree.GetLineSpan(node.Span);
                 TypeSyntax typeSyntax = node.Type;
                 ExpressionSyntax expressionSyntax = node.Expression;
-                TypeInfo typeModel = Model.GetTypeInfo(typeSyntax);
-                TypeInfo expressionTypeModel = Model.GetTypeInfo(expressionSyntax);
+                TypeInfo typeModel = _model.GetTypeInfo(typeSyntax);
+                TypeInfo expressionTypeModel = _model.GetTypeInfo(expressionSyntax);
                 if (typeModel.Equals(expressionTypeModel))
                     Data.Add(new CollectedData<String>(typeModel.Type.ToDisplayString(), span.StartLinePosition, span.EndLinePosition));
                 base.VisitCastExpression(node);
             }
 
-            public SemanticModel Model { get; }
-
             public IList<CollectedData<String>> Data { get; }
+
+            private readonly SemanticModel _model;
         }
     }
 }

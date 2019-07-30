@@ -21,7 +21,7 @@ namespace SourceCheckUtil.Analyzers
         {
             _output.WriteOutputLine($"Execution of NonAsciiIdentifiersAnalyzer started");
             Regex identifierRegex = new Regex("^[a-zA-Z0-9_]+$");
-            NonConsistentIdentifiersDetector detector = new NonConsistentIdentifiersDetector(model, identifierRegex);
+            NonConsistentIdentifiersDetector detector = new NonConsistentIdentifiersDetector(identifierRegex);
             detector.Visit(tree.GetRoot());
             Boolean hasErrors = ProcessErrors(filename, detector.Data);
             _output.WriteOutputLine($"Execution of NonAsciiIdentifiersAnalyzer finished");
@@ -34,7 +34,7 @@ namespace SourceCheckUtil.Analyzers
             _output.WriteOutputLine($"Found {errors.Count} non-ASCII identifiers leading to errors in the ported C++ code");
             foreach (CollectedData<String> error in errors)
             {
-                _output.WriteErrorLine($"[ERROR]: {filename} file contains the following non-ASCII identifier \"{error.Data}\" which are started at {error.StartPosition} and finished at {error.EndPosition}");
+                _output.WriteErrorLine($"[ERROR]: File {filename} contains the following non-ASCII identifier \"{error.Data}\" which are started at {error.StartPosition} and finished at {error.EndPosition}");
             }
             return errors.Count > 0;
         }
@@ -43,9 +43,8 @@ namespace SourceCheckUtil.Analyzers
 
         private class NonConsistentIdentifiersDetector : CSharpSyntaxWalker
         {
-            public NonConsistentIdentifiersDetector(SemanticModel model, Regex identifierRegex) : base(SyntaxWalkerDepth.Token)
+            public NonConsistentIdentifiersDetector(Regex identifierRegex) : base(SyntaxWalkerDepth.Token)
             {
-                Model = model;
                 Data = new List<CollectedData<String>>();
                 _identifierRegex = identifierRegex;
             }
@@ -57,8 +56,6 @@ namespace SourceCheckUtil.Analyzers
                     Data.Add(new CollectedData<String>(token.ValueText, span.StartLinePosition, span.EndLinePosition));
                 base.VisitToken(token);
             }
-
-            public SemanticModel Model { get; }
 
             public IList<CollectedData<String>> Data { get; }
 

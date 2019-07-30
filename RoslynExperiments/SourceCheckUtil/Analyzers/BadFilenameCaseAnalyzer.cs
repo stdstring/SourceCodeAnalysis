@@ -71,31 +71,31 @@ namespace SourceCheckUtil.Analyzers
         {
             public TopLevelTypeNamesCollector(SemanticModel model)
             {
-                Model = model;
+                _model = model;
                 Data = new List<CollectedData<String>>();
             }
 
             public override void VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                VisitTypeDeclarationImpl(node, Model.GetDeclaredSymbol(node));
+                VisitTypeDeclarationImpl(node, _model.GetDeclaredSymbol(node));
                 base.VisitClassDeclaration(node);
             }
 
             public override void VisitStructDeclaration(StructDeclarationSyntax node)
             {
-                VisitTypeDeclarationImpl(node, Model.GetDeclaredSymbol(node));
+                VisitTypeDeclarationImpl(node, _model.GetDeclaredSymbol(node));
                 base.VisitStructDeclaration(node);
             }
 
             public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
             {
-                VisitTypeDeclarationImpl(node, Model.GetDeclaredSymbol(node));
+                VisitTypeDeclarationImpl(node, _model.GetDeclaredSymbol(node));
                 base.VisitInterfaceDeclaration(node);
             }
 
             public override void VisitDelegateDeclaration(DelegateDeclarationSyntax node)
             {
-                VisitTypeDeclarationImpl(node, Model.GetDeclaredSymbol(node));
+                VisitTypeDeclarationImpl(node, _model.GetDeclaredSymbol(node));
                 base.VisitDelegateDeclaration(node);
             }
 
@@ -106,9 +106,9 @@ namespace SourceCheckUtil.Analyzers
                     Data.Add(new CollectedData<String>(type.ToDisplayString(), span.StartLinePosition, span.EndLinePosition));
             }
 
-            public SemanticModel Model { get; }
-
             public IList<CollectedData<String>> Data { get; }
+
+            private readonly SemanticModel _model;
         }
     }
 }

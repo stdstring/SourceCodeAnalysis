@@ -35,7 +35,7 @@ namespace SourceCheckUtil.Analyzers
             foreach (VirtualInterfaceInheritanceData error in errors)
             {
                 String baseInterfaces = String.Join(", ", error.BaseInterfaces);
-                _output.WriteErrorLine($"[ERROR]: {filename} file contains {error.Type} type which implements the following base non-system interfaces not marked for virtual inheritance in the ported C++ code: {baseInterfaces}");
+                _output.WriteErrorLine($"[ERROR]: File {filename} contains {error.Type} type which implements the following base non-system interfaces not marked for virtual inheritance in the ported C++ code: {baseInterfaces}");
             }
             return errors.Count > 0;
         }
@@ -59,13 +59,13 @@ namespace SourceCheckUtil.Analyzers
         {
             public VirtualInterfaceInheritanceDetector(SemanticModel model)
             {
-                Model = model;
+                _model = model;
                 Data = new List<VirtualInterfaceInheritanceData>();
             }
 
             public override void VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                INamedTypeSymbol type = Model.GetDeclaredSymbol(node);
+                INamedTypeSymbol type = _model.GetDeclaredSymbol(node);
                 IList<INamedTypeSymbol> baseInterfaces = new List<INamedTypeSymbol>();
                 CollectBaseInterfaces(type.Interfaces, baseInterfaces);
                 ProcessBaseInterfaces(type, baseInterfaces);
@@ -74,7 +74,7 @@ namespace SourceCheckUtil.Analyzers
 
             public override void VisitStructDeclaration(StructDeclarationSyntax node)
             {
-                INamedTypeSymbol type = Model.GetDeclaredSymbol(node);
+                INamedTypeSymbol type = _model.GetDeclaredSymbol(node);
                 IList<INamedTypeSymbol> baseInterfaces = new List<INamedTypeSymbol>();
                 CollectBaseInterfaces(type.Interfaces, baseInterfaces);
                 ProcessBaseInterfaces(type, baseInterfaces);
@@ -83,14 +83,12 @@ namespace SourceCheckUtil.Analyzers
 
             public override void VisitInterfaceDeclaration(InterfaceDeclarationSyntax node)
             {
-                INamedTypeSymbol type = Model.GetDeclaredSymbol(node);
+                INamedTypeSymbol type = _model.GetDeclaredSymbol(node);
                 IList<INamedTypeSymbol> baseInterfaces = new List<INamedTypeSymbol>();
                 CollectBaseInterfaces(type, baseInterfaces);
                 ProcessBaseInterfaces(type, baseInterfaces);
                 base.VisitInterfaceDeclaration(node);
             }
-
-            public SemanticModel Model { get; }
 
             public IList<VirtualInterfaceInheritanceData> Data { get; }
 
@@ -139,6 +137,8 @@ namespace SourceCheckUtil.Analyzers
             {
                 return type.GetAttributes().Any(attr => String.Equals(attr.AttributeClass.Name, ImplDefs.VirtualInheritanceAttribute));
             }
+
+            private readonly SemanticModel _model;
         }
     }
 }
