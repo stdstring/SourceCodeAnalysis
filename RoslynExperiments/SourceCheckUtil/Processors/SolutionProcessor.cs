@@ -36,8 +36,9 @@ namespace SourceCheckUtil.Processors
             }
             Solution solution = workspace.OpenSolutionAsync(_solutionFilename).Result;
             Boolean result = true;
-            foreach (Project project in solution.Projects)
+            foreach (ProjectId projectId in solution.GetProjectDependencyGraph().GetTopologicallySortedProjects())
             {
+                Project project = solution.GetProject(projectId);
                 result &= Process(project, analyzers);
             }
             _output.WriteOutputLine($"Processing of the solution {_solutionFilename} is finished");
