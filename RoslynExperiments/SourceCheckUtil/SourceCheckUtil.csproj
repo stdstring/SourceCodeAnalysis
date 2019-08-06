@@ -148,6 +148,7 @@
     <Compile Include="Config\AppConfig.cs" />
     <Compile Include="Config\AppUsageMode.cs" />
     <Compile Include="ExternalConfig\EmptyExternalConfig.cs" />
+    <Compile Include="ExternalConfig\ExternalConfigData.cs" />
     <Compile Include="ExternalConfig\ExternalConfigFactory.cs" />
     <Compile Include="ExternalConfig\IExternalConfig.cs" />
     <Compile Include="ExternalConfig\PorterExternalConfig.cs" />
