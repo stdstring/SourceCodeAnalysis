@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using SourceCheckUtil.Analyzers;
 using SourceCheckUtil.ExternalConfig;
+using SourceCheckUtil.Managers;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Processors
@@ -27,9 +29,14 @@ namespace SourceCheckUtil.Processors
             if (!CompilationChecker.CheckCompilationErrors(project.FilePath, compilation, _output))
                 return false;
             Boolean result = true;
+            String projectDir = Path.GetDirectoryName(project.FilePath);
             ExternalConfigData configData = _externalConfig.Load(project.Name);
+            FileProcessingManager manager = new FileProcessingManager(configData);
             foreach (Document file in project.Documents.Where(doc => doc.SourceCodeKind == SourceCodeKind.Regular && !ProjectIgnoredFiles.IgnoreFile(doc.FilePath)))
             {
+                String documentRelativeFilename = GetRelativeFilename(projectDir, file.FilePath);
+                if (manager.SkipFileProcessing(documentRelativeFilename))
+                    continue;
                 result &= fileProcessor(file, compilation, configData, analyzers);
             }
             return result;
@@ -38,6 +45,11 @@ namespace SourceCheckUtil.Processors
         public Boolean ProcessFile(String filename, SyntaxTree tree, SemanticModel model, ExternalConfigData externalData, IList<IFileAnalyzer> analyzers)
         {
             return _fileProcessor.Process(filename, tree, model, analyzers, externalData);
+        }
+
+        private String GetRelativeFilename(String projectDir, String filename)
+        {
+            return filename.Substring(projectDir.Length + 1);
         }
 
         private readonly IExternalConfig _externalConfig;

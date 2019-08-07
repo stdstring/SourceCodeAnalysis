@@ -12,23 +12,22 @@ namespace SourceCheckUtil.ExternalConfig
         {
             if (!CheckConfig(config))
                 throw new FileNotFoundException(config);
-            _configDir = IsDirectory(config) ? config : Path.GetDirectoryName(config);
             _configFilename = IsFile(config) ? config : Path.Combine(config, DefaultConfigName);
         }
 
         public ExternalConfigData LoadDefault()
         {
             XDocument document = XDocument.Load(_configFilename);
-            return LoadImpl(document.Root);
+            return LoadImpl(document.Root, _configFilename);
         }
 
         public ExternalConfigData Load(String projectName)
         {
-            String projectConfig = Path.Combine(_configDir, String.Concat(projectName, ConfigExtension));
+            String projectConfig = Path.Combine(Path.GetDirectoryName(_configFilename), String.Concat(projectName, ConfigExtension));
             if (!IsFile(projectConfig))
                 return LoadDefault();
             XDocument document = XDocument.Load(projectConfig);
-            return LoadImpl(document.Root);
+            return LoadImpl(document.Root, projectConfig);
         }
 
         public static Boolean CheckConfig(String config)
@@ -43,20 +42,21 @@ namespace SourceCheckUtil.ExternalConfig
         }
 
         // TODO (std_string) : think about non-recursive version of this impl
-        private ExternalConfigData LoadImpl(String importName)
+        private ExternalConfigData LoadImpl(String importName, String parentConfig)
         {
+            importName = importName.Replace("/", "\\");
             // TODO (std_string) : we must know how to process case when importName will be relative to porter directory (if 'use_porter_home_directory_while_resolving_path' option is enabled)
-            String importConfigName = Path.IsPathRooted(importName) ? importName : Path.Combine(_configDir, importName);
+            String importConfigName = Path.IsPathRooted(importName) ? importName : Path.Combine(Path.GetDirectoryName(parentConfig), importName);
             XDocument document = XDocument.Load(importConfigName);
-            return LoadImpl(document.Root);
+            return LoadImpl(document.Root, importConfigName);
         }
 
         // TODO (std_string) : think about non-recursive version of this impl
-        private ExternalConfigData LoadImpl(XElement root)
+        private ExternalConfigData LoadImpl(XElement root, String currentConfig)
         {
             IList<AttributeData> attributes = GetAttributes(root);
             IList<FileProcessingData> fileProcessing = GetFileProcessing(root);
-            ExternalConfigData[] configs = GetImports(root).Select(LoadImpl).ToArray();
+            ExternalConfigData[] configs = GetImports(root).Select(import => LoadImpl(import, currentConfig)).ToArray();
             return ExternalConfigData.Merge(new ExternalConfigData(attributes, fileProcessing), configs);
         }
 
@@ -89,6 +89,7 @@ namespace SourceCheckUtil.ExternalConfig
         {
             return root.Elements()
                 .Where(element => String.Equals(element.Name.LocalName, "files"))
+                .SelectMany(element => element.Elements())
                 .Select(CreateFileProcessingData)
                 .OrderByDescending(data => data.Mode)
                 .ToList();
@@ -123,7 +124,6 @@ namespace SourceCheckUtil.ExternalConfig
             return File.Exists(path);
         }
 
-        private readonly String _configDir;
         private readonly String _configFilename;
 
         private const String DefaultConfigName = "porter.config";
