@@ -135,6 +135,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SourceCheckUtilConfigTests.cs" />
     <Compile Include="Utils\ExecutionHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceCheckUtilIntegrationTests.cs" />

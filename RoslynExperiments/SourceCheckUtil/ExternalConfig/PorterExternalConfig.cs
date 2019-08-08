@@ -91,7 +91,6 @@ namespace SourceCheckUtil.ExternalConfig
                 .Where(element => String.Equals(element.Name.LocalName, "files"))
                 .SelectMany(element => element.Elements())
                 .Select(CreateFileProcessingData)
-                .OrderByDescending(data => data.Mode)
                 .ToList();
         }
 

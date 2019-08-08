@@ -13,7 +13,7 @@ namespace SourceCheckUtil.Managers
         {
             if (externalData == null)
                 throw new ArgumentNullException(nameof(externalData));
-            _matches = externalData.FileProcessing.Select(data => new FileMatch(data)).ToList();
+            _matches = externalData.FileProcessing.Select(data => new FileMatch(data)).OrderBy(match => match.Mode).ToList();
         }
 
         public Boolean SkipFileProcessing(String filePath)
