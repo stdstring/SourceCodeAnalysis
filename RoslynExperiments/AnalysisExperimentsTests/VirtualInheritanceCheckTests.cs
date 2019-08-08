@@ -475,10 +475,6 @@ namespace AnalysisExperimentsTests
             SemanticModel model = compilation.GetSemanticModel(tree);
             InterfaceInheritanceCollector collector = new InterfaceInheritanceCollector(model);
             collector.Visit(root);
-            /*foreach (var data in collector.Data)
-            {
-                Console.WriteLine(data);
-            }*/
             Assert.AreEqual(expectedData, collector.Data);
         }
     }

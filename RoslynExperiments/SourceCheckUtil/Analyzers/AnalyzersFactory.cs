@@ -11,8 +11,7 @@ namespace SourceCheckUtil.Analyzers
             {
                 new BadFilenameCaseAnalyzer(output),
                 new CastToSameTypeAnalyzer(output),
-                new NonAsciiIdentifiersAnalyzer(output),
-                new VirtualInheritanceAnalyzer(output)
+                new NonAsciiIdentifiersAnalyzer(output)
             };
         }
     }

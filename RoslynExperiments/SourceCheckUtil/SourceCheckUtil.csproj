@@ -143,7 +143,6 @@
     <Compile Include="Analyzers\CastToSameTypeAnalyzer.cs" />
     <Compile Include="Analyzers\IFileAnalyzer.cs" />
     <Compile Include="Analyzers\NonAsciiIdentifiersAnalyzer.cs" />
-    <Compile Include="Analyzers\VirtualInheritanceAnalyzer.cs" />
     <Compile Include="Config\AppConfigParser.cs" />
     <Compile Include="Config\AppConfig.cs" />
     <Compile Include="Config\AppUsageMode.cs" />
@@ -165,7 +164,6 @@
     <Compile Include="Utils\CompilationChecker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\ImplDefs.cs" />
     <Compile Include="Utils\OutputImpl.cs" />
   </ItemGroup>
   <ItemGroup>
