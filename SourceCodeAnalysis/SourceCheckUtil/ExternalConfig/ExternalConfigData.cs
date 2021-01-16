@@ -44,7 +44,6 @@ namespace SourceCheckUtil.ExternalConfig
             FileProcessing = new List<FileProcessingData>();
         }
 
-
         public ExternalConfigData(IList<AttributeData> attributes, IList<FileProcessingData> fileProcessing)
         {
             Attributes = attributes;

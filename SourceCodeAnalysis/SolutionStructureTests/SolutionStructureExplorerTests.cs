@@ -18,7 +18,7 @@ namespace SolutionStructureTests
         [Test]
         public void ShowThisSolutionStructure()
         {
-            const String solutionRelativePath = "..//..//..//RoslynExperiments.sln";
+            const String solutionRelativePath = "..//..//..//SourceCodeAnalysis.sln";
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
             Solution solution = workspace.OpenSolutionAsync(solutionRelativePath).Result;
             foreach (ProjectId projectId in solution.GetProjectDependencyGraph().GetTopologicallySortedProjects())

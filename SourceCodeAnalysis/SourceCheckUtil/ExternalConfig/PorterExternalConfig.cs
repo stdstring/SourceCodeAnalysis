@@ -54,61 +54,10 @@ namespace SourceCheckUtil.ExternalConfig
         // TODO (std_string) : think about non-recursive version of this impl
         private ExternalConfigData LoadImpl(XElement root, String currentConfig)
         {
-            IList<AttributeData> attributes = GetAttributes(root);
-            IList<FileProcessingData> fileProcessing = GetFileProcessing(root);
-            ExternalConfigData[] configs = GetImports(root).Select(import => LoadImpl(import, currentConfig)).ToArray();
+            IList<AttributeData> attributes = PorterExternalConfigHelper.GetAttributes(root);
+            IList<FileProcessingData> fileProcessing = PorterExternalConfigHelper.GetFileProcessing(root);
+            ExternalConfigData[] configs = PorterExternalConfigHelper.GetImports(root).Select(import => LoadImpl(import, currentConfig)).ToArray();
             return ExternalConfigData.Merge(new ExternalConfigData(attributes, fileProcessing), configs);
-        }
-
-        private IList<String> GetImports(XElement root)
-        {
-            return root.Elements()
-                .Where(element => String.Equals(element.Name.LocalName, "import"))
-                .Select(element => element.Attribute("config").Value)
-                .ToList();
-        }
-
-        private IList<AttributeData> GetAttributes(XElement root)
-        {
-            return root.Elements()
-                .Where(element => String.Equals(element.Name.LocalName, "attribute"))
-                .Select(CreateAttributeData)
-                .ToList();
-        }
-
-        private AttributeData CreateAttributeData(XElement attributeElement)
-        {
-            String name = attributeElement.Attribute("name").Value;
-            IDictionary<String, String> data = attributeElement.Attributes()
-                .Where(attr => !String.Equals(attr.Name.LocalName, "name"))
-                .ToDictionary(attr => attr.Name.LocalName, attr => attr.Value);
-            return new AttributeData(name, data);
-        }
-
-        private IList<FileProcessingData> GetFileProcessing(XElement root)
-        {
-            return root.Elements()
-                .Where(element => String.Equals(element.Name.LocalName, "files"))
-                .SelectMany(element => element.Elements())
-                .Select(CreateFileProcessingData)
-                .ToList();
-        }
-
-        private FileProcessingData CreateFileProcessingData(XElement fileProcessingElement)
-        {
-            const String includeElement = "include";
-            const String excludeElement = "exclude";
-            const String onlyElement = "only";
-            IDictionary<String, FileProcessingMode> fileProcessModeMap = new Dictionary<String, FileProcessingMode>
-            {
-                {includeElement, FileProcessingMode.Include},
-                {excludeElement, FileProcessingMode.Exclude},
-                {onlyElement, FileProcessingMode.Only}
-            };
-            const String maskAttribute = "file";
-            FileProcessingMode mode = fileProcessModeMap[fileProcessingElement.Name.LocalName];
-            String mask = fileProcessingElement.Attribute(maskAttribute).Value;
-            return new FileProcessingData(mode, mask);
         }
 
         // TODO (std_string) : probably move this into the specialized place

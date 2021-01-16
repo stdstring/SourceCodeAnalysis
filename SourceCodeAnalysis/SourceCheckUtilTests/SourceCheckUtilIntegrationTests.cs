@@ -13,56 +13,56 @@ namespace SourceCheckUtilTests
         public void ProcessEmptyArgs()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("");
-            CheckExecutionResult(executionResult, 0, AppDescription, "");
+            ExecutionChecker.Check(executionResult, 0, AppDescription, "");
         }
 
         [Test]
         public void ProcessHelp()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("--help");
-            CheckExecutionResult(executionResult, 0, AppDescription, "");
+            ExecutionChecker.Check(executionResult, 0, AppDescription, "");
         }
 
         [Test]
         public void ProcessVersion()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("--version");
-            CheckExecutionResult(executionResult, 0, "0.1\r\n", "");
+            ExecutionChecker.Check(executionResult, 0, "0.1\r\n", "");
         }
 
         [Test]
         public void ProcessUnknownArg()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("--some-strange-option");
-            CheckExecutionResult(executionResult, -1, BadUsageMessage + AppDescription, "");
+            ExecutionChecker.Check(executionResult, -1, BadUsageMessage + AppDescription, "");
         }
 
         [Test]
         public void ProcessAnalysisUnknownArg()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("--source \"..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj\" --some-strange-option");
-            CheckExecutionResult(executionResult, -1, BadUsageMessage + AppDescription, "");
+            ExecutionChecker.Check(executionResult, -1, BadUsageMessage + AppDescription, "");
         }
 
         [Test]
         public void ProcessAnalysisForUnknownSource()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("SomeUnknownExample.csproj", null, false);
-            CheckExecutionResult(executionResult, -1, "", "[ERROR]: Bad (unknown) target SomeUnknownExample.csproj\r\n");
+            ExecutionChecker.Check(executionResult, -1, "", "[ERROR]: Bad (unknown) target SomeUnknownExample.csproj\r\n");
         }
 
         [Test]
         public void ProcessAnalysisForUnknownConfig()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj", "..\\SomeConfig.config", false);
-            CheckExecutionResult(executionResult, -1, "", "[ERROR]: Bad (unknown) config ..\\SomeConfig.config\r\n");
+            ExecutionChecker.Check(executionResult, -1, "", "[ERROR]: Bad (unknown) config ..\\SomeConfig.config\r\n");
         }
 
         [Test]
         public void ProcessGoodExampleProjectAnalysis()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj", null, false);
-            CheckExecutionResult(executionResult, 0, "", "");
+            ExecutionChecker.Check(executionResult, 0, "", "");
         }
 
         [Test]
@@ -88,29 +88,21 @@ namespace SourceCheckUtilTests
                                                  "[ERROR]: File {0}\\IdentifiersExample.cs contains the following non-ASCII identifier \"парам2\" which are started at 32,74 and finished at 32,80\r\n";
             String projectDirectoryFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..\\..\\..\\Examples\\BadExample"));
             String expectedError = String.Format(expectedErrorTemplate, projectDirectoryFullPath);
-            CheckExecutionResult(executionResult, -1, "", expectedError);
+            ExecutionChecker.Check(executionResult, -1, "", expectedError);
         }
 
         [Test]
         public void ProcessSolutionWithDependenciesBetweenProjectsAnalysis()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\LibraryDependenciesExample\\LibraryDependenciesExample.sln", null, false);
-            CheckExecutionResult(executionResult, 0, "", "");
+            ExecutionChecker.Check(executionResult, 0, "", "");
         }
 
         [Test]
         public void ProcessProjectWithDependenciesAnalysis()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\LibraryDependenciesExample\\DependentLibrary\\DependentLibrary.csproj", null, false);
-            CheckExecutionResult(executionResult, 0, "", "");
-        }
-
-        private void CheckExecutionResult(ExecutionResult result, Int32 exitCode, String outputData, String errorData)
-        {
-            Assert.IsNotNull(result);
-            Assert.AreEqual(exitCode, result.ExitCode);
-            Assert.AreEqual(outputData, result.OutputData);
-            Assert.AreEqual(errorData, result.ErrorData);
+            ExecutionChecker.Check(executionResult, 0, "", "");
         }
 
         private const String BadUsageMessage = "Bad usage of the application.\r\n";

@@ -13,7 +13,7 @@ namespace SourceCheckUtilTests
         public void ProcessWithConfig()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\ConfigUsageExample\\ConfigUsageExample.sln", "..\\..\\..\\Examples\\ConfigUsageExample\\config", false);
-            CheckExecutionResult(executionResult, 0, "", "");
+            ExecutionChecker.Check(executionResult, 0, "", "");
         }
 
         [Test]
@@ -28,15 +28,7 @@ namespace SourceCheckUtilTests
                                                  "[ERROR]: File {0}\\FilesProcessingExample\\Only\\BadClassNameExample.cs contains type named FilesProcessingExample.Only.BadClassNameexample with name match to the filename with ignoring case\r\n";
             String projectDirectoryFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..\\..\\..\\Examples\\ConfigUsageExample"));
             String expectedError = String.Format(expectedErrorTemplate, projectDirectoryFullPath);
-            CheckExecutionResult(executionResult, -1, "", expectedError);
-        }
-
-        private void CheckExecutionResult(ExecutionResult result, Int32 exitCode, String outputData, String errorData)
-        {
-            Assert.IsNotNull(result);
-            Assert.AreEqual(exitCode, result.ExitCode);
-            Assert.AreEqual(outputData, result.OutputData);
-            Assert.AreEqual(errorData, result.ErrorData);
+            ExecutionChecker.Check(executionResult, -1, "", expectedError);
         }
     }
 }

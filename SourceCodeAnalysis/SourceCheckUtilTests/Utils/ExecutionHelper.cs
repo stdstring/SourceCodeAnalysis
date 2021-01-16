@@ -7,22 +7,6 @@ using System.Text;
 
 namespace SourceCheckUtilTests.Utils
 {
-    internal class ExecutionResult
-    {
-        public ExecutionResult(Int32 exitCode, String outputData, String errorData)
-        {
-            ExitCode = exitCode;
-            OutputData = outputData;
-            ErrorData = errorData;
-        }
-
-        public Int32 ExitCode { get; }
-
-        public String OutputData { get; }
-
-        public String ErrorData { get; }
-    }
-
     internal static class ExecutionHelper
     {
         public static ExecutionResult Execute(String target, String config, Boolean verbose)
@@ -49,8 +33,8 @@ namespace SourceCheckUtilTests.Utils
                 utilProcess.StartInfo.WorkingDirectory = currentDir;
                 IList<String> output = new List<String>();
                 IList<String> error = new List<String>();
-                utilProcess.ErrorDataReceived += (sender, e) => { error.Add(e.Data); };
                 utilProcess.OutputDataReceived += (sender, e) => { output.Add(e.Data); };
+                utilProcess.ErrorDataReceived += (sender, e) => { error.Add(e.Data); };
                 utilProcess.Start();
                 utilProcess.BeginErrorReadLine();
                 utilProcess.BeginOutputReadLine();

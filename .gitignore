@@ -1,6 +1,6 @@
 *.GeneratedMSBuildEditorConfig.editorconfig
 *.user
-RoslynExperiments/packages/*
-RoslynExperiments/**/.vs/*
-RoslynExperiments/**/bin/*
-RoslynExperiments/**/obj/*
+SourceCodeAnalysis/packages/*
+SourceCodeAnalysis/**/.vs/*
+SourceCodeAnalysis/**/bin/*
+SourceCodeAnalysis/**/obj/*
