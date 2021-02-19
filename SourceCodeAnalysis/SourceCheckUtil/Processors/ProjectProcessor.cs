@@ -4,14 +4,14 @@ using System.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using SourceCheckUtil.Analyzers;
-using SourceCheckUtil.ExternalConfig;
+using SourceCheckUtil.Config;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Processors
 {
     internal class ProjectProcessor : ISourceProcessor
     {
-        public ProjectProcessor(String projectFilename, IExternalConfig externalConfig, OutputImpl output)
+        public ProjectProcessor(String projectFilename, IConfig externalConfig, OutputImpl output)
         {
             if (String.IsNullOrEmpty(projectFilename))
                 throw new ArgumentNullException(nameof(projectFilename));
@@ -41,7 +41,7 @@ namespace SourceCheckUtil.Processors
             return result;
         }
 
-        private Boolean Process(Document file, Compilation compilation, ExternalConfigData externalData, IList<IFileAnalyzer> analyzers)
+        private Boolean Process(Document file, Compilation compilation, ConfigData externalData, IList<IFileAnalyzer> analyzers)
         {
             _output.WriteOutputLine($"Processing of the file {file.FilePath} is started");
             _output.WriteOutputLine();

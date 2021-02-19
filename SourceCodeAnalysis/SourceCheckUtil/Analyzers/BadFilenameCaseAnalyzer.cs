@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using SourceCheckUtil.ExternalConfig;
+using SourceCheckUtil.Config;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Analyzers
@@ -19,7 +19,7 @@ namespace SourceCheckUtil.Analyzers
             _output = output;
         }
 
-        public Boolean Process(String filename, SyntaxTree tree, SemanticModel model, ExternalConfigData externalData)
+        public Boolean Process(String filename, SyntaxTree tree, SemanticModel model, ConfigData externalData)
         {
             _output.WriteOutputLine($"Execution of BadFilenameCaseAnalyzer started");
             TopLevelTypeNamesCollector collector = new TopLevelTypeNamesCollector(model);

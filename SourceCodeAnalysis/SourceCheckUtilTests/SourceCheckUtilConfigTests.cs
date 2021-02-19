@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using NUnit.Framework;
 using SourceCheckUtilTests.Utils;
 
@@ -9,10 +8,27 @@ namespace SourceCheckUtilTests
     [TestFixture]
     public class SourceCheckUtilConfigTests
     {
+        [TearDown]
+        public void TearDown()
+        {
+            EnvironmentHelper.RemoveAuxiliaryEntities();
+        }
+
+        [Test]
+        public void ProcessWithDefaultConfig()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\ConfigUsageExample\\ConfigUsageExample.sln",
+                                                                      "..\\..\\..\\Examples\\ConfigUsageExample\\DefaultConfig",
+                                                                      false);
+            ExecutionChecker.Check(executionResult, 0, "", "");
+        }
+
         [Test]
         public void ProcessWithConfig()
         {
-            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\ConfigUsageExample\\ConfigUsageExample.sln", "..\\..\\..\\Examples\\ConfigUsageExample\\config", false);
+            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\ConfigUsageExample\\ConfigUsageExample.sln",
+                                                                      "..\\..\\..\\Examples\\ConfigUsageExample\\Config",
+                                                                      false);
             ExecutionChecker.Check(executionResult, 0, "", "");
         }
 
@@ -26,7 +42,7 @@ namespace SourceCheckUtilTests
                                                  "[ERROR]: File {0}\\FilesProcessingExample\\Include\\BadCastsExample.cs contains the cast to the same type string which are started at 7,26 and finished at 7,41\r\n" +
                                                  "[ERROR]: File {0}\\FilesProcessingExample\\Only\\BadClassNameExample.cs contains type named FilesProcessingExample.Only.BadClassnameExample with name match to the filename with ignoring case\r\n" +
                                                  "[ERROR]: File {0}\\FilesProcessingExample\\Only\\BadClassNameExample.cs contains type named FilesProcessingExample.Only.BadClassNameexample with name match to the filename with ignoring case\r\n";
-            String projectDirectoryFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..\\..\\..\\Examples\\ConfigUsageExample"));
+            String projectDirectoryFullPath = Path.GetFullPath(Path.Combine(EnvironmentHelper.GetContainedDirectory(), "..\\..\\..\\Examples\\ConfigUsageExample"));
             String expectedError = String.Format(expectedErrorTemplate, projectDirectoryFullPath);
             ExecutionChecker.Check(executionResult, -1, "", expectedError);
         }

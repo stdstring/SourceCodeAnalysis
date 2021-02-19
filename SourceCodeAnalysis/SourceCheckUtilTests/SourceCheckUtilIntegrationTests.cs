@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using NUnit.Framework;
 using SourceCheckUtilTests.Utils;
 
@@ -9,39 +8,52 @@ namespace SourceCheckUtilTests
     [TestFixture]
     public class SourceCheckUtilIntegrationTests
     {
+        [TearDown]
+        public void TearDown()
+        {
+            EnvironmentHelper.RemoveAuxiliaryEntities();
+        }
+
         [Test]
         public void ProcessEmptyArgs()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("");
-            ExecutionChecker.Check(executionResult, 0, AppDescription, "");
+            ExecutionChecker.Check(executionResult, 0, SourceCheckUtilOutputDef.AppDescription, "");
         }
 
         [Test]
         public void ProcessHelp()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("--help");
-            ExecutionChecker.Check(executionResult, 0, AppDescription, "");
+            ExecutionChecker.Check(executionResult, 0, SourceCheckUtilOutputDef.AppDescription, "");
         }
 
         [Test]
         public void ProcessVersion()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("--version");
-            ExecutionChecker.Check(executionResult, 0, "0.1\r\n", "");
+            ExecutionChecker.Check(executionResult, 0, "0.2\r\n", "");
         }
 
         [Test]
         public void ProcessUnknownArg()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("--some-strange-option");
-            ExecutionChecker.Check(executionResult, -1, BadUsageMessage + AppDescription, "");
+            ExecutionChecker.Check(executionResult, -1, SourceCheckUtilOutputDef.AppDescription, SourceCheckUtilOutputDef.BadUsageMessage);
         }
 
         [Test]
         public void ProcessAnalysisUnknownArg()
         {
-            ExecutionResult executionResult = ExecutionHelper.Execute("--source \"..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj\" --some-strange-option");
-            ExecutionChecker.Check(executionResult, -1, BadUsageMessage + AppDescription, "");
+            ExecutionResult executionResult = ExecutionHelper.Execute("--source=\"..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj\" --some-strange-option");
+            ExecutionChecker.Check(executionResult, -1, SourceCheckUtilOutputDef.AppDescription, SourceCheckUtilOutputDef.BadUsageMessage);
+        }
+
+        [Test]
+        public void ProcessAnalysisForSourceWithoutValue()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("--source= --verbose");
+            ExecutionChecker.Check(executionResult, -1, "", SourceCheckUtilOutputDef.BadSourceMessage);
         }
 
         [Test]
@@ -55,7 +67,21 @@ namespace SourceCheckUtilTests
         public void ProcessAnalysisForUnknownConfig()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\GoodExample\\GoodExample.csproj", "..\\SomeConfig.config", false);
-            ExecutionChecker.Check(executionResult, -1, "", "[ERROR]: Bad (unknown) config ..\\SomeConfig.config\r\n");
+            ExecutionChecker.Check(executionResult, -1, "", SourceCheckUtilOutputDef.BadConfigMessage);
+        }
+
+        [Test]
+        public void ProcessAnalysisForConfigWithoutSource()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("--config=\"..\\..\\..\\Examples\\ConfigUsageExample\\Config\"");
+            ExecutionChecker.Check(executionResult, -1, SourceCheckUtilOutputDef.AppDescription, SourceCheckUtilOutputDef.BadUsageMessage);
+        }
+
+        [Test]
+        public void ProcessAnalysisForConfigWithoutValue()
+        {
+            ExecutionResult executionResult = ExecutionHelper.Execute("--source=\"..\\..\\..\\Examples\\ConfigUsageExample\\ConfigUsageExample.sln\" --config=");
+            ExecutionChecker.Check(executionResult, -1, "", SourceCheckUtilOutputDef.BadConfigMessage);
         }
 
         [Test]
@@ -86,7 +112,7 @@ namespace SourceCheckUtilTests
                                                  "[ERROR]: File {0}\\IdentifiersExample.cs contains the following non-ASCII identifier \"локальноеДействие\" which are started at 32,45 and finished at 32,62\r\n" +
                                                  "[ERROR]: File {0}\\IdentifiersExample.cs contains the following non-ASCII identifier \"парам1\" which are started at 32,66 and finished at 32,72\r\n" +
                                                  "[ERROR]: File {0}\\IdentifiersExample.cs contains the following non-ASCII identifier \"парам2\" which are started at 32,74 and finished at 32,80\r\n";
-            String projectDirectoryFullPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..\\..\\..\\Examples\\BadExample"));
+            String projectDirectoryFullPath = Path.GetFullPath(Path.Combine(EnvironmentHelper.GetContainedDirectory(), "..\\..\\..\\Examples\\BadExample"));
             String expectedError = String.Format(expectedErrorTemplate, projectDirectoryFullPath);
             ExecutionChecker.Check(executionResult, -1, "", expectedError);
         }
@@ -104,11 +130,5 @@ namespace SourceCheckUtilTests
             ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\LibraryDependenciesExample\\DependentLibrary\\DependentLibrary.csproj", null, false);
             ExecutionChecker.Check(executionResult, 0, "", "");
         }
-
-        private const String BadUsageMessage = "Bad usage of the application.\r\n";
-        private const String AppDescription = "Application usage:\r\n" +
-                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config {config-file|config-dir}] [--verbose]\r\n" +
-                                              "2. {APP} --help\r\n" +
-                                              "3. {APP} --version\r\n";
     }
 }

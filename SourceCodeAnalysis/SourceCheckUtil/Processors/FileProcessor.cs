@@ -5,14 +5,14 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SourceCheckUtil.Analyzers;
-using SourceCheckUtil.ExternalConfig;
+using SourceCheckUtil.Config;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Processors
 {
     internal class FileProcessor : ISourceProcessor
     {
-        public FileProcessor(String filename, IExternalConfig externalConfig, OutputImpl output)
+        public FileProcessor(String filename, IConfig externalConfig, OutputImpl output)
         {
             if (String.IsNullOrEmpty(filename))
                 throw new ArgumentNullException(nameof(filename));
@@ -60,7 +60,7 @@ namespace SourceCheckUtil.Processors
         }
 
         private readonly String _filename;
-        private readonly IExternalConfig _externalConfig;
+        private readonly IConfig _externalConfig;
         private readonly OutputImpl _output;
         private readonly FileProcessorHelper _processorHelper;
     }

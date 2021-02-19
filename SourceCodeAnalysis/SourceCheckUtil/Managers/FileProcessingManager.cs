@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using SourceCheckUtil.ExternalConfig;
+using SourceCheckUtil.Config;
 
 namespace SourceCheckUtil.Managers
 {
     internal class FileProcessingManager
     {
-        public FileProcessingManager(ExternalConfigData externalData)
+        public FileProcessingManager(ConfigData externalData)
         {
             if (externalData == null)
                 throw new ArgumentNullException(nameof(externalData));

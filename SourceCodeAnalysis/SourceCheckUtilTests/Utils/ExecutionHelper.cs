@@ -11,13 +11,23 @@ namespace SourceCheckUtilTests.Utils
     {
         public static ExecutionResult Execute(String target, String config, Boolean verbose)
         {
+            return Execute(target, config, verbose, new Dictionary<String, String>());
+        }
+
+        public static ExecutionResult Execute(String target, String config, Boolean verbose, IDictionary<String, String> environmentVariables)
+        {
             if (String.IsNullOrEmpty(target))
                 throw new ArgumentNullException(nameof(target));
             String arguments = CreateArgList(target, config, verbose);
-            return Execute(arguments);
+            return Execute(arguments, environmentVariables);
         }
 
         public static ExecutionResult Execute(String arguments)
+        {
+            return Execute(arguments, new Dictionary<String, String>());
+        }
+
+        public static ExecutionResult Execute(String arguments, IDictionary<String, String> environmentVariables)
         {
             using (Process utilProcess = new Process())
             {
@@ -31,6 +41,8 @@ namespace SourceCheckUtilTests.Utils
                 utilProcess.StartInfo.StandardErrorEncoding = Encoding.UTF8;
                 utilProcess.StartInfo.StandardOutputEncoding = Encoding.UTF8;
                 utilProcess.StartInfo.WorkingDirectory = currentDir;
+                foreach (KeyValuePair<String, String> environmentVariable in environmentVariables)
+                    utilProcess.StartInfo.Environment.Add(environmentVariable.Key, environmentVariable.Value);
                 IList<String> output = new List<String>();
                 IList<String> error = new List<String>();
                 utilProcess.OutputDataReceived += (sender, e) => { output.Add(e.Data); };
@@ -46,9 +58,9 @@ namespace SourceCheckUtilTests.Utils
         private static String CreateArgList(String target, String config, Boolean verbose)
         {
             StringBuilder dest = new StringBuilder();
-            dest.AppendFormat("--source \"{0}\"", target);
+            dest.AppendFormat("--source=\"{0}\"", target);
             if (!String.IsNullOrEmpty(config))
-                dest.AppendFormat(" --config \"{0}\"", config);
+                dest.AppendFormat(" --config=\"{0}\"", config);
             if (verbose)
                 dest.Append(" --verbose");
             return dest.ToString();

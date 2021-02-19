@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using SourceCheckUtil.Analyzers;
+using SourceCheckUtil.Args;
 using SourceCheckUtil.Config;
-using SourceCheckUtil.ExternalConfig;
 using SourceCheckUtil.Processors;
 using SourceCheckUtil.Utils;
 
@@ -13,14 +13,27 @@ namespace SourceCheckUtil
     {
         public static Int32 Main(String[] args)
         {
-            Boolean result = MainImpl(args);
-            return result ? 0 : -1;
+            try
+            {
+                Boolean result = MainImpl(args);
+                return result ? 0 : -1;
+            }
+            catch (PorterConfigException e)
+            {
+                Console.Error.WriteLine(e.Message);
+                return -1;
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+                return -1;
+            }
         }
 
         private static Boolean MainImpl(String[] args)
         {
-            AppConfig config = AppConfigParser.Parse(args);
-            switch (config.Mode)
+            AppArgs appArgs = AppArgsParser.Parse(args);
+            switch (appArgs.Mode)
             {
                 case AppUsageMode.Help:
                     Console.WriteLine(AppDescription);
@@ -29,23 +42,28 @@ namespace SourceCheckUtil
                     Console.WriteLine(VersionNumber);
                     return true;
                 case AppUsageMode.Analysis:
-                    AnalysisConfig analysisConfig = new AnalysisConfig(config);
                     Console.OutputEncoding = Encoding.UTF8;
-                    OutputImpl output = new OutputImpl(Console.Out, Console.Error, analysisConfig.Verbose);
-                    IExternalConfig externalConfig = ExternalConfigFactory.Create(analysisConfig.Config);
+                    IConfig externalConfig = ConfigFactory.Create(appArgs);
                     if (externalConfig == null)
                     {
-                        output.WriteErrorLine($"[ERROR]: Bad (unknown) config {analysisConfig.Config}");
+                        Console.Error.WriteLine(BadConfigMessage);
                         return false;
                     }
-                    ISourceProcessor processor = SourceProcessorFactory.Create(analysisConfig.Source, externalConfig, output);
+                    OutputImpl output = new OutputImpl(Console.Out, Console.Error, appArgs.Verbose);
+                    ISourceProcessor processor = SourceProcessorFactory.Create(appArgs.Source, externalConfig, output);
                     IList<IFileAnalyzer> analyzers = AnalyzersFactory.Create(output);
                     Boolean processResult = processor.Process(analyzers);
                     output.WriteOutputLine($"Result of analysis: analysis is {(processResult ? "succeeded" : "failed")}");
                     return processResult;
+                case AppUsageMode.BadSource:
+                    Console.Error.WriteLine(BadSourceMessage);
+                    return false;
+                case AppUsageMode.BadConfig:
+                    Console.Error.WriteLine(BadConfigMessage);
+                    return false;
                 case AppUsageMode.BadAppUsage:
                 case AppUsageMode.Unknown:
-                    Console.WriteLine(BadUsageMessage);
+                    Console.Error.WriteLine(BadUsageMessage);
                     Console.WriteLine(AppDescription);
                     return false;
                 default:
@@ -54,10 +72,12 @@ namespace SourceCheckUtil
         }
 
         private const String AppDescription = "Application usage:\r\n" +
-                                              "1. {APP} --source {solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config {config-file|config-dir}] [--verbose]\r\n" +
+                                              "1. {APP} --source={solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config={config-file|config-dir}] [--verbose]\r\n" +
                                               "2. {APP} --help\r\n" +
                                               "3. {APP} --version";
-        private const String BadUsageMessage = "Bad usage of the application.";
-        private const String VersionNumber = "0.1";
+        private const String BadUsageMessage = "[ERROR]: Bad usage of the application.";
+        private const String BadSourceMessage = "[ERROR]: Bad/empty/unknown source path.";
+        private const String BadConfigMessage = "[ERROR]: Bad/empty/unknown config path.";
+        private const String VersionNumber = "0.2";
     }
 }

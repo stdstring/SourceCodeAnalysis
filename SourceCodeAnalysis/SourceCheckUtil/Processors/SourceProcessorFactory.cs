@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Build.Locator;
-using SourceCheckUtil.ExternalConfig;
+using SourceCheckUtil.Config;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Processors
 {
     internal static class SourceProcessorFactory
     {
-        public static ISourceProcessor Create(String source, IExternalConfig externalConfig, OutputImpl output)
+        public static ISourceProcessor Create(String source, IConfig externalConfig, OutputImpl output)
         {
             if (String.IsNullOrEmpty(source))
                 throw new ArgumentNullException(nameof(source));
@@ -22,7 +22,7 @@ namespace SourceCheckUtil.Processors
             return ProcessorsMap[sourceExtension](source, externalConfig, output);
         }
 
-        private static readonly IDictionary<String, Func<String, IExternalConfig, OutputImpl, ISourceProcessor>> ProcessorsMap = new Dictionary<String, Func<String, IExternalConfig, OutputImpl, ISourceProcessor>>
+        private static readonly IDictionary<String, Func<String, IConfig, OutputImpl, ISourceProcessor>> ProcessorsMap = new Dictionary<String, Func<String, IConfig, OutputImpl, ISourceProcessor>>
         {
             {".sln", (source, config, output) => new SolutionProcessor(source, config, output)},
             {".csproj", (source, config, output) => new ProjectProcessor(source, config, output)},

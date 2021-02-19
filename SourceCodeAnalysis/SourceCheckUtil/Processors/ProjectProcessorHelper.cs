@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.CodeAnalysis;
 using SourceCheckUtil.Analyzers;
-using SourceCheckUtil.ExternalConfig;
+using SourceCheckUtil.Config;
 using SourceCheckUtil.Managers;
 using SourceCheckUtil.Utils;
 
@@ -12,7 +12,7 @@ namespace SourceCheckUtil.Processors
 {
     internal class ProjectProcessorHelper
     {
-        public ProjectProcessorHelper(IExternalConfig externalConfig, OutputImpl output)
+        public ProjectProcessorHelper(IConfig externalConfig, OutputImpl output)
         {
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
@@ -23,14 +23,14 @@ namespace SourceCheckUtil.Processors
             _fileProcessor = new FileProcessorHelper();
         }
 
-        public Boolean ProcessProject(Project project, IList<IFileAnalyzer> analyzers, Func<Document, Compilation, ExternalConfigData, IList<IFileAnalyzer>, Boolean> fileProcessor)
+        public Boolean ProcessProject(Project project, IList<IFileAnalyzer> analyzers, Func<Document, Compilation, ConfigData, IList<IFileAnalyzer>, Boolean> fileProcessor)
         {
             Compilation compilation = project.GetCompilationAsync().Result;
             if (!CompilationChecker.CheckCompilationErrors(project.FilePath, compilation, _output))
                 return false;
             Boolean result = true;
             String projectDir = Path.GetDirectoryName(project.FilePath);
-            ExternalConfigData configData = _externalConfig.Load(project.Name);
+            ConfigData configData = _externalConfig.Load(project.Name);
             FileProcessingManager manager = new FileProcessingManager(configData);
             foreach (Document file in project.Documents.Where(doc => doc.SourceCodeKind == SourceCodeKind.Regular && !ProjectIgnoredFiles.IgnoreFile(doc.FilePath)))
             {
@@ -42,7 +42,7 @@ namespace SourceCheckUtil.Processors
             return result;
         }
 
-        public Boolean ProcessFile(String filename, SyntaxTree tree, SemanticModel model, ExternalConfigData externalData, IList<IFileAnalyzer> analyzers)
+        public Boolean ProcessFile(String filename, SyntaxTree tree, SemanticModel model, ConfigData externalData, IList<IFileAnalyzer> analyzers)
         {
             return _fileProcessor.Process(filename, tree, model, analyzers, externalData);
         }
@@ -52,7 +52,7 @@ namespace SourceCheckUtil.Processors
             return filename.Substring(projectDir.Length + 1);
         }
 
-        private readonly IExternalConfig _externalConfig;
+        private readonly IConfig _externalConfig;
         private readonly OutputImpl _output;
         private readonly FileProcessorHelper _fileProcessor;
     }
