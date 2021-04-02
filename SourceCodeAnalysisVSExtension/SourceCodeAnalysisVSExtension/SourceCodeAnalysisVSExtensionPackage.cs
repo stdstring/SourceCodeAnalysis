@@ -2,6 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using SourceCodeAnalysisVSExtension.Config;
 using SourceCodeAnalysisVSExtension.Utils;
 using Task = System.Threading.Tasks.Task;
 
@@ -27,6 +28,7 @@ namespace SourceCodeAnalysisVSExtension
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(SourceCodeAnalysisVSExtensionPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideOptionPage(typeof(ConfigPageCustom), "Source code analysis app", "General", 0, 0, true)]
     public sealed class SourceCodeAnalysisVSExtensionPackage : AsyncPackage
     {
         /// <summary>

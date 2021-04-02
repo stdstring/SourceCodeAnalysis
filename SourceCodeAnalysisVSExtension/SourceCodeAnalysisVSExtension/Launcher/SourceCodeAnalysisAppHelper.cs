@@ -7,27 +7,34 @@ namespace SourceCodeAnalysisVSExtension.Launcher
 {
     internal static class SourceCodeAnalysisAppHelper
     {
-        public static async Task<String> PrepareAnalysisAppAsync(AsyncPackage package)
+        public static async Task<String> PrepareAnalysisAppAsync(AsyncPackage package, String appPath)
         {
             await OutputHelper.OutputMessageAsync(package, $"Search of \"{SourceCodeAnalysisCommonDefs.AppFilename}\" app is started");
-            String appPath = SourceCodeAnalysisAppDetector.FindSourceCodeAnalysisApp(SourceCodeAnalysisCommonDefs.AppFilename);
-            if (!String.IsNullOrEmpty(appPath))
-                return appPath;
-            String prepareAppPath = SourceCodeAnalysisAppDetector.FindSourceCodeAnalysisApp(SourceCodeAnalysisCommonDefs.AppPrepareFilename);
-            if (String.IsNullOrEmpty(prepareAppPath))
+            String buildScriptPath = SourceCodeAnalysisAppDetector.DetectApp(appPath, DetectType.PrepareScript);
+            if (!String.IsNullOrEmpty(buildScriptPath))
+                return await BuildAnalysisAppAsync(package, appPath, buildScriptPath);
+            String analysisAppPath = SourceCodeAnalysisAppDetector.DetectApp(appPath, DetectType.Application);
+            if (!String.IsNullOrEmpty(analysisAppPath))
             {
-                await OutputHelper.OutputMessageAsync(package, $"\"{SourceCodeAnalysisCommonDefs.AppFilename}\" app is missing");
-                await UIHelper.ShowMessageAsync(package, "Missing analysis app", $"{SourceCodeAnalysisCommonDefs.AppFilename} app is missing");
-                return null;
+                await OutputHelper.OutputMessageAsync(package, $"Application \"{SourceCodeAnalysisCommonDefs.AppFilename}\" is found");
+                return analysisAppPath;
             }
+            await OutputHelper.OutputMessageAsync(package, $"Analysis application \"{SourceCodeAnalysisCommonDefs.AppFilename}\" is missing");
+            await UIHelper.ShowMessageAsync(package, "Missing analysis app", $"{SourceCodeAnalysisCommonDefs.AppFilename} app is missing");
+            return null;
+        }
+
+        private static async Task<String> BuildAnalysisAppAsync(AsyncPackage package, String appPath, String buildScriptPath)
+        {
+            await OutputHelper.OutputMessageAsync(package, $"Build script \"{SourceCodeAnalysisCommonDefs.AppPrepareFilename}\" is found");
             await OutputHelper.OutputMessageAsync(package, $"Build of \"{SourceCodeAnalysisCommonDefs.AppFilename}\" app is started");
-            ExecutionResult buildResult = await ExecutionHelper.ExecuteAsync("python.exe", prepareAppPath);
+            ExecutionResult buildResult = await ExecutionHelper.ExecuteBuildAnalysisAppAsync(buildScriptPath);
             if (buildResult.ExitCode == 0)
             {
                 await OutputHelper.OutputMessageAsync(package, $"Build of \"{SourceCodeAnalysisCommonDefs.AppFilename}\" app is completed");
-                return SourceCodeAnalysisAppDetector.FindSourceCodeAnalysisApp(SourceCodeAnalysisCommonDefs.AppFilename);
+                return buildResult.OutputData.Trim();
             }
-            await OutputHelper.OutputBadBuildAnalysisAppAsync(package, buildResult);
+            await OutputHelper.OutputMessageAsync(package, $"Build of \"{SourceCodeAnalysisCommonDefs.AppFilename}\" app is failed");
             await UIHelper.ShowMessageAsync(package, "Build fails of analysis app", $"Build of \"{SourceCodeAnalysisCommonDefs.AppFilename}\" app is failed");
             return null;
         }

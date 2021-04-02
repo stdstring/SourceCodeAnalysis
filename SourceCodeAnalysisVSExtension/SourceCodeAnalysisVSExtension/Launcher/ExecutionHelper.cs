@@ -10,9 +10,17 @@ namespace SourceCodeAnalysisVSExtension.Launcher
 {
     internal static class ExecutionHelper
     {
-        public static async Task<ExecutionResult> ExecuteSourceCodeAnalysisAsync(String app, String target)
+        public static async Task<ExecutionResult> ExecuteSourceCodeAnalysisAsync(String app, String target, String config)
         {
-            return await ExecuteAsync(app, $"--source=\"{target}\"");
+            StringBuilder args = new StringBuilder($"--source=\"{target}\"");
+            if (!String.IsNullOrEmpty(config))
+                args.Append($" --config=\"{config}{(config.EndsWith("\\") ? "\\" : "")}\"");
+            return await ExecuteAsync(app, args.ToString());
+        }
+
+        public static async Task<ExecutionResult> ExecuteBuildAnalysisAppAsync(String buildScriptPath)
+        {
+            return await ExecuteAsync("python.exe", buildScriptPath);
         }
 
         public static async Task<ExecutionResult> ExecuteAsync(String app, String args)

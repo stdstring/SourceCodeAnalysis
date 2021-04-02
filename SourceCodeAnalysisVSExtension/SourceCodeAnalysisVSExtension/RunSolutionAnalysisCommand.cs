@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.Shell;
 using System;
 using System.ComponentModel.Design;
+using SourceCodeAnalysisVSExtension.Config;
 using SourceCodeAnalysisVSExtension.Launcher;
 using SourceCodeAnalysisVSExtension.Utils;
 using Task = System.Threading.Tasks.Task;
@@ -77,16 +78,18 @@ namespace SourceCodeAnalysisVSExtension
 
         private async Task ExecuteSolutionAnalysisAsync(String target)
         {
-            String appPath = await SourceCodeAnalysisAppHelper.PrepareAnalysisAppAsync(_package);
+            IConfigDataProvider configDataProvider = new AppDataConfigDataProvider();
+            String appPath = await SourceCodeAnalysisAppHelper.PrepareAnalysisAppAsync(_package, configDataProvider.GetAppPath());
             if (!String.IsNullOrEmpty(appPath))
-                await ExecuteSolutionAnalysisImplAsync(target, appPath);
+                await ExecuteSolutionAnalysisImplAsync(target, appPath, configDataProvider);
             await _commandExecutionLimiter.StopCommandExecAsync();
         }
 
-        private async Task ExecuteSolutionAnalysisImplAsync(String target, String appPath)
+        private async Task ExecuteSolutionAnalysisImplAsync(String target, String appPath, IConfigDataProvider configDataProvider)
         {
             await OutputHelper.OutputMessageAsync(ServiceProvider, $"Source code analysis for solution named \"{target}\" is started");
-            ExecutionResult result = await ExecutionHelper.ExecuteSourceCodeAnalysisAsync(appPath, target);
+            String configPath = ConfigFinder.FindConfig(configDataProvider, target);
+            ExecutionResult result = await ExecutionHelper.ExecuteSourceCodeAnalysisAsync(appPath, target, configPath);
             await OutputHelper.OutputTargetAnalysisResultAsync(ServiceProvider, result, target, "solution");
             await OutputHelper.OutputMessageAsync(ServiceProvider, $"Source code analysis for solution named \"{target}\" is finished");
             await UIHelper.ShowSolutionSummaryAsync(_package, result, target);

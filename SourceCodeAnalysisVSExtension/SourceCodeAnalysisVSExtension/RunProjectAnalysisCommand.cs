@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Linq;
+using SourceCodeAnalysisVSExtension.Config;
 using SourceCodeAnalysisVSExtension.Launcher;
 using SourceCodeAnalysisVSExtension.Utils;
 using Task = System.Threading.Tasks.Task;
@@ -79,30 +80,33 @@ namespace SourceCodeAnalysisVSExtension
 
         private async Task ExecuteProjectsAnalysisAsync(IList<ProjectData> projects, ProjectsAnalysisStat statistics)
         {
-            String appPath = await SourceCodeAnalysisAppHelper.PrepareAnalysisAppAsync(_package);
+            IConfigDataProvider configDataProvider = new AppDataConfigDataProvider();
+            String appPath = await SourceCodeAnalysisAppHelper.PrepareAnalysisAppAsync(_package, configDataProvider.GetAppPath());
             if (!String.IsNullOrEmpty(appPath))
-                await ExecuteProjectsAnalysisImplAsync(projects, statistics, appPath);
+                await ExecuteProjectsAnalysisImplAsync(projects, statistics, appPath, configDataProvider);
             await _commandExecutionLimiter.StopCommandExecAsync();
         }
 
-        private async Task ExecuteProjectsAnalysisImplAsync(IList<ProjectData> projects, ProjectsAnalysisStat statistics, String appPath)
+        private async Task ExecuteProjectsAnalysisImplAsync(IList<ProjectData> projects, ProjectsAnalysisStat statistics, String appPath, IConfigDataProvider configDataProvider)
         {
             await OutputHelper.OutputMessageAsync(ServiceProvider, $"Source code analysis for {statistics.TargetType} named \"{statistics.ProjectNames}\" is started");
             foreach (ProjectData project in projects)
             {
+                String target = project.FileName;
                 if (String.Equals(project.LanguageId, LanguageCSharpId))
                 {
-                    ExecutionResult result = await ExecutionHelper.ExecuteSourceCodeAnalysisAsync(appPath, project.FileName);
+                    String configPath = ConfigFinder.FindConfig(configDataProvider, target);
+                    ExecutionResult result = await ExecutionHelper.ExecuteSourceCodeAnalysisAsync(appPath, target, configPath);
                     if (result.ExitCode == 0)
                         ++statistics.SuccessCount;
                     else
                         ++statistics.FailedCount;
-                    await OutputHelper.OutputTargetAnalysisResultAsync(ServiceProvider, result, project.FileName, "project");
+                    await OutputHelper.OutputTargetAnalysisResultAsync(ServiceProvider, result, target, "project");
                 }
                 else
                 {
                     ++statistics.SkippedCount;
-                    await OutputHelper.OutputMessageAsync(ServiceProvider, $"Project \"{project.FileName}\" can't be processed due to unsupported language");
+                    await OutputHelper.OutputMessageAsync(ServiceProvider, $"Project \"{target}\" can't be processed due to unsupported language");
                 }
             }
             await OutputHelper.OutputMessageAsync(ServiceProvider, $"Source code analysis for {statistics.TargetType} named \"{statistics.ProjectNames}\" is finished");

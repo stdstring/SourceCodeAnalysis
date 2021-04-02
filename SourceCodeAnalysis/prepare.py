@@ -28,7 +28,9 @@ async def find_msbuild_location() -> pathlib.Path:
 async def restore_nuget_packages(nuget_path: pathlib.Path, dest_path: pathlib.Path) -> None:
     nuget_cmd = f"\"{nuget_path}\" restore \"{dest_path}\""
     nuget_proc = await asyncio.create_subprocess_shell(nuget_cmd, stdout=asyncio.subprocess.DEVNULL, stderr=asyncio.subprocess.STDOUT)
-    check_returncode(await nuget_proc.wait())
+    returncode = await nuget_proc.wait()
+    if returncode != 0:
+        raise ValueError("restore nuget packages")
 
 
 async def build_solution(msbuild_path: pathlib.Path, solution_path: pathlib.Path) -> None:
@@ -40,16 +42,24 @@ async def build_solution(msbuild_path: pathlib.Path, solution_path: pathlib.Path
     check_returncode(msbuild_proc.returncode)
 
 
+# TODO (std_string) : use output of msbuild in future instead of search
+def output_target_name(base_path: pathlib.Path) -> None:
+    target_path = base_path.joinpath("SourceCheckUtil/bin/Debug/SourceCheckUtil.exe")
+    print(target_path)
+
+
 async def main() -> None:
     base_path = pathlib.Path(__file__).resolve().parent
-    nuget_path = base_path.joinpath("../../external/nuget-5.8.1/nuget.exe")
-    solution_path = base_path.joinpath("../SourceCodeAnalysis.sln")
+    nuget_path = base_path.joinpath("../external/nuget-5.8.1/nuget.exe")
+    solution_path = base_path.joinpath("SourceCodeAnalysis.sln")
     # find msbuild utility
     msbuild_path = await find_msbuild_location()
     # restore nuget packages
     await restore_nuget_packages(nuget_path, solution_path)
     # build solution
     await build_solution(msbuild_path, solution_path)
+    # output target name
+    output_target_name(base_path)
 
 
 asyncio.run(main())
