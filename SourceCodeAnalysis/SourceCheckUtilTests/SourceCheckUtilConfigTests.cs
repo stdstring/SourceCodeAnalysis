@@ -14,21 +14,19 @@ namespace SourceCheckUtilTests
             EnvironmentHelper.RemoveAuxiliaryEntities();
         }
 
-        [Test]
-        public void ProcessWithDefaultConfig()
+        [TestCase("..\\..\\..\\Examples\\ConfigUsageExample\\DefaultConfig")]
+        [TestCase("..\\..\\..\\Examples\\ConfigUsageExample\\DefaultConfig\\porter.config")]
+        public void ProcessWithDefaultConfig(String configPath)
         {
-            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\ConfigUsageExample\\ConfigUsageExample.sln",
-                                                                      "..\\..\\..\\Examples\\ConfigUsageExample\\DefaultConfig",
-                                                                      false);
+            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\ConfigUsageExample\\ConfigUsageExample.sln", configPath, false);
             ExecutionChecker.Check(executionResult, 0, "", "");
         }
 
-        [Test]
-        public void ProcessWithConfig()
+        [TestCase("..\\..\\..\\Examples\\ConfigUsageExample\\Config")]
+        [TestCase("..\\..\\..\\Examples\\ConfigUsageExample\\Config\\porter.config")]
+        public void ProcessWithConfig(String configPath)
         {
-            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\ConfigUsageExample\\ConfigUsageExample.sln",
-                                                                      "..\\..\\..\\Examples\\ConfigUsageExample\\Config",
-                                                                      false);
+            ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\ConfigUsageExample\\ConfigUsageExample.sln", configPath, false);
             ExecutionChecker.Check(executionResult, 0, "", "");
         }
 

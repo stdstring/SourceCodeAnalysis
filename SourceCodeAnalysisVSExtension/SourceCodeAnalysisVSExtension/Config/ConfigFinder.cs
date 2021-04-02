@@ -10,7 +10,7 @@ namespace SourceCodeAnalysisVSExtension.Config
             String bestConfig = "";
             foreach (SourceEntry entry in dataProvider.GetEntries())
             {
-                String source = Environment.ExpandEnvironmentVariables(entry.Source);
+                String source = Environment.ExpandEnvironmentVariables(entry.Source).TrimEnd('\\');
                 if (sourcePath.StartsWith(source) && source.Length > bestSource.Length)
                 {
                     bestSource = source;
