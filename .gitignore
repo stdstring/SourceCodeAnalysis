@@ -4,7 +4,7 @@ SourceCodeAnalysis/packages/*
 SourceCodeAnalysis/**/.vs/*
 SourceCodeAnalysis/**/bin/*
 SourceCodeAnalysis/**/obj/*
-SourceCodeAnalysisVSExtension/packages/*
-SourceCodeAnalysisVSExtension/**/.vs/*
-SourceCodeAnalysisVSExtension/**/bin/*
-SourceCodeAnalysisVSExtension/**/obj/*
+VSExtension/packages/*
+VSExtension/**/.vs/*
+VSExtension/**/bin/*
+VSExtension/**/obj/*
