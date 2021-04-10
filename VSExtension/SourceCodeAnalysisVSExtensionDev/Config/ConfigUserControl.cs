@@ -92,7 +92,7 @@ namespace SourceCodeAnalysisVSExtensionDev.Config
                 if (Directory.Exists(sourcePath))
                     dialog.InitialDirectory = sourcePath;
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                    textBoxAppPath.Text = dialog.FileName;
+                    textBoxSourcePath.Text = dialog.FileName;
             }
             /*using (FolderBrowserDialog dialog = new FolderBrowserDialog())
             {
