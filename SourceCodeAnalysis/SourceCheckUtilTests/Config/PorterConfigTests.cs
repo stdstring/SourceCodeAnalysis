@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 using SourceCheckUtil.Config;
 
@@ -12,7 +14,8 @@ namespace SourceCheckUtilTests.Config
         [Test]
         public void LoadConfigWithImport()
         {
-            IConfig config = new PorterConfig("..\\..\\..\\Examples\\ConfigWithImport\\main.config");
+            String currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
+            IConfig config = new PorterConfig(Path.Combine(currentDir, "..\\..\\..\\Examples\\ConfigWithImport\\main.config"));
             ConfigData data = config.LoadDefault();
             const Int32 expectedAttributeCount = 3;
             Assert.AreEqual(expectedAttributeCount, data.Attributes.Count);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
@@ -18,9 +19,9 @@ namespace SolutionStructureTests
         [Test]
         public void ShowThisSolutionStructure()
         {
-            const String solutionRelativePath = "..//..//..//SourceCodeAnalysis.sln";
+            String currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".";
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
-            Solution solution = workspace.OpenSolutionAsync(solutionRelativePath).Result;
+            Solution solution = workspace.OpenSolutionAsync(Path.Combine(currentDir, "..//..//..//SourceCodeAnalysis.sln")).Result;
             foreach (ProjectId projectId in solution.GetProjectDependencyGraph().GetTopologicallySortedProjects())
             {
                 Project project = solution.GetProject(projectId);
