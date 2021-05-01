@@ -23,6 +23,13 @@ namespace SourceCheckUtil.Utils
                 _output.WriteLine(value);
         }
 
+        public void WriteOutputLine(String filename, Int32 line, String value)
+        {
+            // line is zero-based
+            if (_verbose)
+                _output.WriteLine($"{filename}({line + 1}): {value}");
+        }
+
         public void WriteOutputLine()
         {
             if (_verbose)
@@ -32,6 +39,12 @@ namespace SourceCheckUtil.Utils
         public void WriteErrorLine(String value)
         {
             _error.WriteLine(value);
+        }
+
+        public void WriteErrorLine(String filename, Int32 line, String value)
+        {
+            // line is zero-based
+            _error.WriteLine($"{filename}({line + 1}): {value}");
         }
 
         public void WriteErrorLine()

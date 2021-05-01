@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using SourceCodeAnalysisVSExtensionCommon.Launcher;
-using SourceCodeAnalysisVSExtensionDev.Launcher;
 using Task = System.Threading.Tasks.Task;
 
 namespace SourceCodeAnalysisVSExtensionDev.Utils
@@ -38,12 +37,6 @@ namespace SourceCodeAnalysisVSExtensionDev.Utils
                 outputPane.WriteLine(result.ErrorData);
             }
             outputPane.WriteLine("");
-        }
-
-        public static async Task OutputBadBuildAnalysisAppAsync(IAsyncServiceProvider serviceProvider, ExecutionResult result)
-        {
-            String message = $"Build of \"{SourceCodeAnalysisCommonDefs.AppFilename}\" app is failed";
-            await OutputExecutionResultAsync(serviceProvider, message, result);
         }
 
         public static async Task OutputTargetAnalysisResultAsync(IAsyncServiceProvider serviceProvider, ExecutionResult result, String target, String targetType)

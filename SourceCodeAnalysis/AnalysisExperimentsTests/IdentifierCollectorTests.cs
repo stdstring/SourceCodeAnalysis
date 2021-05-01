@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using AnalysisExperimentsTests.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using NUnit.Framework;
 
@@ -144,16 +143,9 @@ namespace AnalysisExperimentsTests
 
         private void CheckImpl(String source, CollectedData<String>[] expectedData)
         {
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
-            CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-            CSharpCompilation compilation = CSharpCompilation.Create("CollectIdentifiersCheck")
-                .AddReferences(MetadataReference.CreateFromFile(typeof(String).Assembly.Location))
-                .AddSyntaxTrees(tree)
-                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            AnalysisHelper.CheckCompilationErrors(compilation);
-            SemanticModel model = compilation.GetSemanticModel(tree);
+            SemanticModel model = PreparationHelper.Prepare(source, "CollectIdentifiersCheck");
             IdentifiersCollector detector = new IdentifiersCollector(model);
-            detector.Visit(root);
+            detector.Visit(model.SyntaxTree.GetRoot());
             Assert.AreEqual(expectedData, detector.Data);
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AnalysisExperimentsTests.Utils;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,14 +25,8 @@ namespace AnalysisExperimentsTests
                                   "        }\r\n" +
                                   "    }\r\n" +
                                   "}";
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
-            CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-            CSharpCompilation compilation = CSharpCompilation.Create("SimpleParseExample")
-                .AddReferences(MetadataReference.CreateFromFile(typeof(String).Assembly.Location))
-                .AddSyntaxTrees(tree)
-                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            AnalysisHelper.CheckCompilationErrors(compilation);
-            SemanticModel model = compilation.GetSemanticModel(tree);
+            SemanticModel model = PreparationHelper.Prepare(source, "SimpleParseExample");
+            CompilationUnitSyntax root = model.SyntaxTree.GetCompilationUnitRoot();
             Console.WriteLine($"root.Kind = {root.Kind()}");
             Console.WriteLine();
             Console.WriteLine("Usings:");

@@ -19,20 +19,21 @@ namespace SourceCheckUtil.Analyzers
             _output = output;
         }
 
-        public Boolean Process(String filename, SyntaxTree tree, SemanticModel model, ConfigData externalData)
+        public Boolean Process(String filePath, SyntaxTree tree, SemanticModel model, ConfigData externalData)
         {
             _output.WriteOutputLine($"Execution of BadFilenameCaseAnalyzer started");
             TopLevelTypeNamesCollector collector = new TopLevelTypeNamesCollector(model);
             collector.Visit(tree.GetRoot());
-            Boolean result = Process(filename, collector.Data);
+            Boolean result = Process(filePath, collector.Data);
             _output.WriteOutputLine($"Execution of BadFilenameCaseAnalyzer finished");
             _output.WriteOutputLine();
             return result;
         }
 
-        private Boolean Process(String filename, IList<CollectedData<String>> data)
+        private Boolean Process(String filePath, IList<CollectedData<String>> data)
         {
-            String expectedTypeName = Path.GetFileNameWithoutExtension(filename);
+            String filename = Path.GetFileName(filePath);
+            String expectedTypeName = Path.GetFileNameWithoutExtension(filePath);
             IList<CollectedData<String>> typeWrongNameCaseList = new List<CollectedData<String>>();
             Boolean exactMatch = false;
             foreach (CollectedData<String> item in data)
@@ -45,23 +46,19 @@ namespace SourceCheckUtil.Analyzers
             }
             if (!exactMatch && typeWrongNameCaseList.Count == 0)
             {
-                _output.WriteOutputLine($"[WARNING]: File doesn't contain any types with names corresponding to the name of this file");
+                _output.WriteOutputLine("[WARNING]: File doesn't contain any types with names corresponding to the name of this file");
                 return true;
             }
             if (!exactMatch && typeWrongNameCaseList.Count > 0)
             {
                 _output.WriteOutputLine($"File doesn't contain any type with name exact match to the filename, but contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
                 foreach (CollectedData<String> typeWrongNameCase in typeWrongNameCaseList)
-                {
-                    _output.WriteErrorLine($"[ERROR]: File {filename} contains type named {typeWrongNameCase.Data} with name match to the filename with ignoring case");
-                }
+                    _output.WriteErrorLine(filePath, typeWrongNameCase.StartPosition.Line, $"[ERROR]: Found type named \"{typeWrongNameCase.Data}\" which corresponds the filename \"{filename}\" only at ignoring case");
                 return false;
             }
             _output.WriteOutputLine($"File contains {typeWrongNameCaseList.Count} types with names match to the filename with ignoring case");
             foreach (CollectedData<String> typeWrongNameCase in typeWrongNameCaseList)
-            {
-                _output.WriteOutputLine($"[WARNING]: File contains type named {typeWrongNameCase.Data} with name match to the filename with ignoring case");
-            }
+                _output.WriteOutputLine(filePath, typeWrongNameCase.StartPosition.Line, $"[WARNING]: Found type named \"{typeWrongNameCase.Data}\" which corresponds the filename \"{filename}\" only at ignoring case");
             return true;
         }
 

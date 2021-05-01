@@ -34,13 +34,13 @@ namespace SourceCheckUtilTests
         public void ProcessWithoutConfig()
         {
             ExecutionResult executionResult = ExecutionHelper.Execute("..\\..\\..\\Examples\\ConfigUsageExample\\ConfigUsageExample.sln", null, false);
-            const String expectedErrorTemplate = "[ERROR]: File {0}\\FilesProcessingExample\\Exclude\\BadIdentifierExample.cs contains the following non-ASCII identifier \"sоmеVаr\" which are started at 6,16 and finished at 6,23\r\n" +
-                                                 "[ERROR]: File {0}\\FilesProcessingExample\\Exclude\\BadIdentifierExample.cs contains the following non-ASCII identifier \"sоmеОthеrVаr\" which are started at 7,19 and finished at 7,31\r\n" +
-                                                 "[ERROR]: File {0}\\FilesProcessingExample\\Exclude\\BadIdentifierExample.cs contains the following non-ASCII identifier \"переменная\" which are started at 8,17 and finished at 8,27\r\n" +
-                                                 "[ERROR]: File {0}\\FilesProcessingExample\\Include\\BadCastsExample.cs contains the cast to the same type string which are started at 7,26 and finished at 7,41\r\n" +
-                                                 "[ERROR]: File {0}\\FilesProcessingExample\\Only\\BadClassNameExample.cs contains type named FilesProcessingExample.Only.BadClassnameExample with name match to the filename with ignoring case\r\n" +
-                                                 "[ERROR]: File {0}\\FilesProcessingExample\\Only\\BadClassNameExample.cs contains type named FilesProcessingExample.Only.BadClassNameexample with name match to the filename with ignoring case\r\n";
-            String projectDirectoryFullPath = Path.GetFullPath(Path.Combine(EnvironmentHelper.GetContainedDirectory(), "..\\..\\..\\Examples\\ConfigUsageExample"));
+            const String expectedErrorTemplate = "{0}\\Exclude\\BadIdentifierExample.cs(7): [ERROR]: Found non-ASCII identifier \"sоmеVаr\"\r\n" +
+                                                 "{0}\\Exclude\\BadIdentifierExample.cs(8): [ERROR]: Found non-ASCII identifier \"sоmеОthеrVаr\"\r\n" +
+                                                 "{0}\\Exclude\\BadIdentifierExample.cs(9): [ERROR]: Found non-ASCII identifier \"переменная\"\r\n" +
+                                                 "{0}\\Include\\BadCastsExample.cs(8): [ERROR]: Found cast to the same type \"string\"\r\n" +
+                                                 "{0}\\Only\\BadClassNameExample.cs(3): [ERROR]: Found type named \"FilesProcessingExample.Only.BadClassnameExample\" which corresponds the filename \"BadClassNameExample.cs\" only at ignoring case\r\n" +
+                                                 "{0}\\Only\\BadClassNameExample.cs(7): [ERROR]: Found type named \"FilesProcessingExample.Only.BadClassNameexample\" which corresponds the filename \"BadClassNameExample.cs\" only at ignoring case\r\n";
+            String projectDirectoryFullPath = Path.GetFullPath(Path.Combine(EnvironmentHelper.GetContainedDirectory(), "..\\..\\..\\Examples\\ConfigUsageExample\\FilesProcessingExample"));
             String expectedError = String.Format(expectedErrorTemplate, projectDirectoryFullPath);
             ExecutionChecker.Check(executionResult, -1, "", expectedError);
         }

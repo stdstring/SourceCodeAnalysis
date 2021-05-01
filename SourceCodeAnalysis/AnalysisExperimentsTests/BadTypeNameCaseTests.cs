@@ -36,16 +36,9 @@ namespace AnalysisExperimentsTests
 
         private IList<CollectedData<String>> GetTopLevelTypeNames(String source)
         {
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
-            CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-            CSharpCompilation compilation = CSharpCompilation.Create("BadTypeNameCaseCheck")
-                .AddReferences(MetadataReference.CreateFromFile(typeof(String).Assembly.Location))
-                .AddSyntaxTrees(tree)
-                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            AnalysisHelper.CheckCompilationErrors(compilation);
-            SemanticModel model = compilation.GetSemanticModel(tree);
+            SemanticModel model = PreparationHelper.Prepare(source, "BadTypeNameCaseCheck");
             TopLevelTypeNamesCollector collector = new TopLevelTypeNamesCollector(model);
-            collector.Visit(root);
+            collector.Visit(model.SyntaxTree.GetRoot());
             return collector.Data;
         }
 

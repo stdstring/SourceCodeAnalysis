@@ -4,9 +4,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 
-namespace AnalysisExperimentsTests
+namespace AnalysisExperimentsTests.Utils
 {
-    public static class AnalysisHelper
+    // TODO (std_string) : think about move into some common lib
+    public static class PreparationHelper
     {
         public static void CheckCompilationErrors(CSharpCompilation compilation)
         {
@@ -26,6 +27,17 @@ namespace AnalysisExperimentsTests
             if (diagnostics.Count == 0)
                 Console.WriteLine("No any errors, warnings and infos");
             Console.WriteLine();
+        }
+
+        public static SemanticModel Prepare(String source, String assemblyName)
+        {
+            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
+            CSharpCompilation compilation = CSharpCompilation.Create(assemblyName)
+                .AddReferences(MetadataReference.CreateFromFile(typeof(String).Assembly.Location))
+                .AddSyntaxTrees(tree)
+                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+            CheckCompilationErrors(compilation);
+            return compilation.GetSemanticModel(tree);
         }
     }
 }

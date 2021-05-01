@@ -115,6 +115,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Utils\PreparationHelper.cs" />
+    <Compile Include="Utils\AnalyzerHelper.cs" />
+    <Compile Include="Analyzers\BadFilenameCaseAnalyzerTests.cs" />
+    <Compile Include="Analyzers\CastToSameTypeAnalyzerTests.cs" />
+    <Compile Include="Analyzers\NonAsciiIdentifiersAnalyzerTests.cs" />
     <Compile Include="Config\PorterConfigTests.cs" />
     <Compile Include="EnvironmentHelper.cs" />
     <Compile Include="SourceCheckUtilConfigTests.cs" />

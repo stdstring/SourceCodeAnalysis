@@ -161,16 +161,9 @@ namespace AnalysisExperimentsTests
 
         private void CheckImpl(String source, CollectedData<String>[] expectedData)
         {
-            SyntaxTree tree = CSharpSyntaxTree.ParseText(source);
-            CompilationUnitSyntax root = tree.GetCompilationUnitRoot();
-            CSharpCompilation compilation = CSharpCompilation.Create("CastToSameType")
-                .AddReferences(MetadataReference.CreateFromFile(typeof(String).Assembly.Location))
-                .AddSyntaxTrees(tree)
-                .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-            AnalysisHelper.CheckCompilationErrors(compilation);
-            SemanticModel model = compilation.GetSemanticModel(tree);
+            SemanticModel model = PreparationHelper.Prepare(source, "CastToSameType");
             CastToSameTypeDetector detector = new CastToSameTypeDetector(model);
-            detector.Visit(root);
+            detector.Visit(model.SyntaxTree.GetRoot());
             Assert.AreEqual(expectedData, detector.Data);
         }
     }

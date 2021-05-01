@@ -17,25 +17,23 @@ namespace SourceCheckUtil.Analyzers
             _output = output;
         }
 
-        public Boolean Process(String filename, SyntaxTree tree, SemanticModel model, ConfigData externalData)
+        public Boolean Process(String filePath, SyntaxTree tree, SemanticModel model, ConfigData externalData)
         {
             _output.WriteOutputLine($"Execution of NonAsciiIdentifiersAnalyzer started");
             Regex identifierRegex = new Regex("^[a-zA-Z0-9_]+$");
             NonConsistentIdentifiersDetector detector = new NonConsistentIdentifiersDetector(identifierRegex);
             detector.Visit(tree.GetRoot());
-            Boolean hasErrors = ProcessErrors(filename, detector.Data);
+            Boolean hasErrors = ProcessErrors(filePath, detector.Data);
             _output.WriteOutputLine($"Execution of NonAsciiIdentifiersAnalyzer finished");
             _output.WriteOutputLine();
             return !hasErrors;
         }
 
-        private Boolean ProcessErrors(String filename, IList<CollectedData<String>> errors)
+        private Boolean ProcessErrors(String filePath, IList<CollectedData<String>> errors)
         {
             _output.WriteOutputLine($"Found {errors.Count} non-ASCII identifiers leading to errors in the ported C++ code");
             foreach (CollectedData<String> error in errors)
-            {
-                _output.WriteErrorLine($"[ERROR]: File {filename} contains the following non-ASCII identifier \"{error.Data}\" which are started at {error.StartPosition} and finished at {error.EndPosition}");
-            }
+                _output.WriteErrorLine(filePath, error.StartPosition.Line, $"[ERROR]: Found non-ASCII identifier \"{error.Data}\"");
             return errors.Count > 0;
         }
 
