@@ -23,7 +23,7 @@ namespace SourceCodeAnalysisVSExtensionCommonTests.Config
                 new SourceEntry(someSubprojectPath, someSubprojectConfigPath),
                 new SourceEntry("C:\\OtherRepo", "C:\\Configs\\OtherRepoConfig")
             };
-            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", entries);
+            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", OutputLevel.Error, entries);
             Assert.AreEqual(someRepoConfigPath, ConfigFinder.FindConfig(configDataProvider, someRepoPath));
             Assert.AreEqual("", ConfigFinder.FindConfig(configDataProvider, someProjectPath));
             Assert.AreEqual(someSubprojectConfigPath, ConfigFinder.FindConfig(configDataProvider, someSubprojectPath));
@@ -48,7 +48,7 @@ namespace SourceCodeAnalysisVSExtensionCommonTests.Config
                 new SourceEntry($"{someSubprojectPath}\\", someSubprojectConfigPath),
                 new SourceEntry("C:\\OtherRepo", "C:\\Configs\\OtherRepoConfig")
             };
-            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", entries);
+            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", OutputLevel.Error, entries);
             Assert.AreEqual(someRepoConfigPath, ConfigFinder.FindConfig(configDataProvider, someRepoPath));
             Assert.AreEqual("", ConfigFinder.FindConfig(configDataProvider, someProjectPath));
             Assert.AreEqual(someSubprojectConfigPath, ConfigFinder.FindConfig(configDataProvider, someSubprojectPath));
@@ -73,7 +73,7 @@ namespace SourceCodeAnalysisVSExtensionCommonTests.Config
                 new SourceEntry(someSubprojectPath, someSubprojectConfigPath),
                 new SourceEntry("C:\\OtherRepo", "C:\\Configs\\OtherRepoConfig\\porter.config")
             };
-            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", entries);
+            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", OutputLevel.Error, entries);
             Assert.AreEqual(someRepoConfigPath, ConfigFinder.FindConfig(configDataProvider, someRepoPath));
             Assert.AreEqual("", ConfigFinder.FindConfig(configDataProvider, someProjectPath));
             Assert.AreEqual(someSubprojectConfigPath, ConfigFinder.FindConfig(configDataProvider, someSubprojectPath));
@@ -103,7 +103,7 @@ namespace SourceCodeAnalysisVSExtensionCommonTests.Config
                 new SourceEntry("C:\\OtherRepo", "C:\\Configs\\OtherRepoConfig"),
                 new SourceEntry("C:\\OtherRepo", "C:\\Configs\\OtherRepoConfig\\porter.config")
             };
-            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", entries);
+            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", OutputLevel.Error, entries);
             Assert.AreEqual(someRepoConfigDirPath, ConfigFinder.FindConfig(configDataProvider, someRepoPath));
             Assert.AreEqual("", ConfigFinder.FindConfig(configDataProvider, someProjectPath));
             Assert.AreEqual(someSubprojectConfigFilePath, ConfigFinder.FindConfig(configDataProvider, someSubprojectPath));

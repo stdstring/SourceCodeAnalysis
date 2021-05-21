@@ -11,6 +11,10 @@ namespace SourceCodeAnalysisVSExtensionCommon.Config
 
         void SaveAppPath(String appPath);
 
+        OutputLevel GetOutputLevel();
+
+        void SaveOutputLevel(OutputLevel outputLevel);
+
         IList<SourceEntry> GetEntries();
 
         SourceEntry GetEntry(Int32 index);
@@ -40,12 +44,23 @@ namespace SourceCodeAnalysisVSExtensionCommon.Config
 
         public String GetAppPath()
         {
-            return _configData.AppConfig.AppPath;
+            return _configData.GeneralConfig.AppPath;
         }
 
         public void SaveAppPath(String appPath)
         {
-            _configData.AppConfig.AppPath = appPath;
+            _configData.GeneralConfig.AppPath = appPath;
+            SaveConfigData();
+        }
+
+        public OutputLevel GetOutputLevel()
+        {
+            return _configData.GeneralConfig.OutputLevel;
+        }
+
+        public void SaveOutputLevel(OutputLevel outputLevel)
+        {
+            _configData.GeneralConfig.OutputLevel = outputLevel;
             SaveConfigData();
         }
 

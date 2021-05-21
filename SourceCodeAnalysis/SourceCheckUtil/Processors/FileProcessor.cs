@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SourceCheckUtil.Analyzers;
 using SourceCheckUtil.Config;
+using SourceCheckUtil.Output;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Processors
@@ -28,11 +29,10 @@ namespace SourceCheckUtil.Processors
 
         public Boolean Process(IList<IFileAnalyzer> analyzers)
         {
-            _output.WriteOutputLine($"Processing of the file {_filename} is started");
-            _output.WriteOutputLine();
+            _output.WriteInfoLine($"Processing of the file {_filename} is started");
             if (!File.Exists(_filename))
             {
-                _output.WriteErrorLine($"[ERROR]: Bad (unknown) target {_filename}");
+                _output.WriteFailLine($"Bad (unknown) target {_filename}");
                 return false;
             }
             String source = File.ReadAllText(_filename);
@@ -42,8 +42,7 @@ namespace SourceCheckUtil.Processors
                 return false;
             SemanticModel model = compilation.GetSemanticModel(tree);
             Boolean result = _processorHelper.Process(_filename, tree, model, analyzers, _externalConfig.LoadDefault());
-            _output.WriteOutputLine($"Processing of the file {_filename} is finished");
-            _output.WriteOutputLine();
+            _output.WriteInfoLine($"Processing of the file {_filename} is finished");
             return result;
         }
 

@@ -115,6 +115,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Output\OutputImplTests.cs" />
     <Compile Include="Utils\PreparationHelper.cs" />
     <Compile Include="Utils\AnalyzerHelper.cs" />
     <Compile Include="Analyzers\BadFilenameCaseAnalyzerTests.cs" />

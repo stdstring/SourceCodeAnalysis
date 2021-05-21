@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SourceCheckUtil.Config;
+using SourceCheckUtil.Output;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Analyzers
@@ -20,31 +21,30 @@ namespace SourceCheckUtil.Analyzers
 
         public Boolean Process(String filePath, SyntaxTree tree, SemanticModel model, ConfigData externalData)
         {
-            _output.WriteOutputLine($"Execution of CastToSameTypeAnalyzer started");
+            _output.WriteInfoLine($"Execution of CastToSameTypeAnalyzer started");
             CastToSameTypeDetector detector = new CastToSameTypeDetector(model);
             detector.Visit(tree.GetRoot());
             Boolean hasErrors = ProcessErrors(filePath, detector.Data);
             ProcessWarnings(filePath, detector.Data);
-            _output.WriteOutputLine($"Execution of CastToSameTypeAnalyzer finished");
-            _output.WriteOutputLine();
+            _output.WriteInfoLine($"Execution of CastToSameTypeAnalyzer finished");
             return !hasErrors;
         }
 
         private Boolean ProcessErrors(String filePath, IList<CollectedData<String>> data)
         {
             IList<CollectedData<String>> errors = data.Where(item => _errorCastTypes.Contains(item.Data)).ToList();
-            _output.WriteOutputLine($"Found {errors.Count} casts leading to errors in the ported C++ code");
+            _output.WriteInfoLine($"Found {errors.Count} casts leading to errors in the ported C++ code");
             foreach (CollectedData<String> error in errors)
-                _output.WriteErrorLine(filePath, error.StartPosition.Line, $"[ERROR]: Found cast to the same type \"{error.Data}\"");
+                _output.WriteErrorLine(filePath, error.StartPosition.Line, $"Found cast to the same type \"{error.Data}\"");
             return errors.Count > 0;
         }
 
         private void ProcessWarnings(String filePath, IList<CollectedData<String>> data)
         {
             IList<CollectedData<String>> warnings = data.Where(item => !_errorCastTypes.Contains(item.Data)).ToList();
-            _output.WriteOutputLine($"Found {warnings.Count} casts to the same type not leading to errors in the ported C++ code");
+            _output.WriteInfoLine($"Found {warnings.Count} casts to the same type not leading to errors in the ported C++ code");
             foreach (CollectedData<String> warning in warnings)
-                _output.WriteOutputLine(filePath, warning.StartPosition.Line, $"[WARNING]: Found cast to the same type \"{warning.Data}\"");
+                _output.WriteWarningLine(filePath, warning.StartPosition.Line, $"Found cast to the same type \"{warning.Data}\"");
         }
 
         private readonly OutputImpl _output;

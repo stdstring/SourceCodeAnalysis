@@ -98,7 +98,8 @@ namespace SourceCodeAnalysisVSExtensionDev
                 if (String.Equals(project.LanguageId, LanguageCSharpId))
                 {
                     String configPath = ConfigFinder.FindConfig(configDataProvider, target);
-                    ExecutionResult result = await ExecutionHelper.ExecuteSourceCodeAnalysisAsync(appPath, target, configPath);
+                    OutputLevel outputLevel = configDataProvider.GetOutputLevel();
+                    ExecutionResult result = await ExecutionHelper.ExecuteSourceCodeAnalysisAsync(appPath, target, configPath, outputLevel);
                     if (result.ExitCode == 0)
                         ++statistics.SuccessCount;
                     else

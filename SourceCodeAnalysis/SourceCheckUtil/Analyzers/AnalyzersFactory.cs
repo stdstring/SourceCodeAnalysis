@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using SourceCheckUtil.Utils;
+using SourceCheckUtil.Output;
 
 namespace SourceCheckUtil.Analyzers
 {

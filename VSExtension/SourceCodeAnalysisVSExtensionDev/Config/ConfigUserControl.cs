@@ -15,11 +15,14 @@ namespace SourceCodeAnalysisVSExtensionDev.Config
             _configProviderFactory = configProviderFactory;
         }
 
+        // Common
         private void ConfigUserControl_Load(Object sender, EventArgs e)
         {
             _configProvider = _configProviderFactory();
+            comboBoxOutputLevel.DataSource = Enum.GetValues(typeof(OutputLevel));
             ClearAllErrorProviders();
             textBoxAppPath.Text = _configProvider.GetAppPath();
+            comboBoxOutputLevel.SelectedItem = _configProvider.GetOutputLevel();
             listBoxSources.Items.Clear();
             foreach (SourceEntry entry in _configProvider.GetEntries())
                 listBoxSources.Items.Add(entry.Source);
@@ -27,6 +30,18 @@ namespace SourceCodeAnalysisVSExtensionDev.Config
             textBoxSourcePath.Text = "";
             textBoxConfigPath.Text = "";
             panelSelectedSourceEntry.Enabled = false;
+        }
+
+        // General config
+        private void textBoxAppPath_TextChanged(Object sender, EventArgs e)
+        {
+            errorProviderAppPath.Clear();
+            buttonUpdateGeneralConfig.Enabled = IsGeneralConfigChanged();
+        }
+
+        private void comboBoxOutputLevel_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            buttonUpdateGeneralConfig.Enabled = IsGeneralConfigChanged();
         }
 
         private void buttonShowAppDialog_Click(Object sender, EventArgs e)
@@ -41,21 +56,58 @@ namespace SourceCodeAnalysisVSExtensionDev.Config
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                     textBoxAppPath.Text = dialog.FileName;
             }
-            /*using (FolderBrowserDialog dialog = new FolderBrowserDialog())
-            {
-                if (Directory.Exists(appPath))
-                    dialog.SelectedPath = appPath;
-                if (dialog.ShowDialog() == DialogResult.OK)
-                    textBoxAppPath.Text = dialog.SelectedPath;
-            }*/
         }
 
-        private void buttonUpdateAppLocation_Click(Object sender, EventArgs e)
+        private void buttonUpdateGeneralConfig_Click(Object sender, EventArgs e)
         {
             String appPath = textBoxAppPath.Text.Trim();
-            if (!ValidateAppLocation(appPath))
-                return;
-            _configProvider.SaveAppPath(appPath);
+            if (ConfigDataValidator.ValidateAppLocation(appPath, errorProviderAppPath, buttonShowAppDialog))
+            {
+                _configProvider.SaveAppPath(appPath);
+                _configProvider.SaveOutputLevel((OutputLevel) comboBoxOutputLevel.SelectedItem);
+            }
+            buttonUpdateGeneralConfig.Enabled = false;
+        }
+
+        private void buttonClearGeneralConfig_Click(object sender, EventArgs e)
+        {
+            textBoxAppPath.Text = _configProvider.GetAppPath();
+            comboBoxOutputLevel.SelectedItem = _configProvider.GetOutputLevel();
+        }
+
+        // Configs locations
+        private void listBoxSources_SelectedIndexChanged(Object sender, EventArgs e)
+        {
+            if (listBoxSources.SelectedIndex == -1)
+            {
+                textBoxSourcePath.Text = "";
+                textBoxConfigPath.Text = "";
+                panelSelectedSourceEntry.Enabled = false;
+            }
+            else if (IsNewEntrySelected())
+            {
+                textBoxSourcePath.Text = "";
+                textBoxConfigPath.Text = "";
+                panelSelectedSourceEntry.Enabled = true;
+            }
+            else
+            {
+                SourceEntry entry = _configProvider.GetEntry(listBoxSources.SelectedIndex);
+                textBoxSourcePath.Text = entry.Source;
+                textBoxConfigPath.Text = entry.Config;
+                panelSelectedSourceEntry.Enabled = true;
+            }
+        }
+
+        private void textBoxSourcePath_TextChanged(Object sender, EventArgs e)
+        {
+            errorProviderSourcePath.Clear();
+            buttonUpdateSourceEntry.Enabled = IsSourceEntryChanged();
+        }
+
+        private void textBoxConfigPath_TextChanged(object sender, EventArgs e)
+        {
+            buttonUpdateSourceEntry.Enabled = IsSourceEntryChanged();
         }
 
         private void buttonAddSourceEntry_Click(Object sender, EventArgs e)
@@ -94,13 +146,6 @@ namespace SourceCodeAnalysisVSExtensionDev.Config
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                     textBoxSourcePath.Text = dialog.FileName;
             }
-            /*using (FolderBrowserDialog dialog = new FolderBrowserDialog())
-            {
-                if (Directory.Exists(sourcePath))
-                    dialog.SelectedPath = sourcePath;
-                if (dialog.ShowDialog() == DialogResult.OK)
-                    textBoxSourcePath.Text = dialog.SelectedPath;
-            }*/
         }
 
         private void buttonShowConfigDialog_Click(Object sender, EventArgs e)
@@ -108,8 +153,6 @@ namespace SourceCodeAnalysisVSExtensionDev.Config
             String config = Environment.ExpandEnvironmentVariables(textBoxConfigPath.Text.Trim());
             using (OpenFileDialog dialog = new OpenFileDialog())
             {
-                //if (Directory.Exists(config))
-                //    dialog.InitialDirectory = config;
                 if (File.Exists(config))
                     dialog.InitialDirectory = Path.GetDirectoryName(config);
                 dialog.Filter = "config files (*.config)|*.config";
@@ -123,7 +166,7 @@ namespace SourceCodeAnalysisVSExtensionDev.Config
         {
             String source = textBoxSourcePath.Text.Trim();
             String config = textBoxConfigPath.Text.Trim();
-            if (!ValidateSourceEntry(source, config))
+            if (!ConfigDataValidator.ValidateSourceEntry(source, config, errorProviderSourcePath, buttonShowSourceDialog))
                 return;
             if (IsNewEntrySelected())
             {
@@ -133,54 +176,19 @@ namespace SourceCodeAnalysisVSExtensionDev.Config
             else
                 _configProvider.SaveSourceEntry(listBoxSources.SelectedIndex, source, config);
             listBoxSources.Items[listBoxSources.SelectedIndex] = source;
+            buttonUpdateSourceEntry.Enabled = false;
         }
 
-        private void listBoxSources_SelectedIndexChanged(Object sender, EventArgs e)
-        {
-            if (listBoxSources.SelectedIndex == -1)
-            {
-                textBoxSourcePath.Text = "";
-                textBoxConfigPath.Text = "";
-                panelSelectedSourceEntry.Enabled = false;
-            }
-            else if (IsNewEntrySelected())
-            {
-                textBoxSourcePath.Text = "";
-                textBoxConfigPath.Text = "";
-                panelSelectedSourceEntry.Enabled = true;
-            }
-            else
-            {
-                SourceEntry entry = _configProvider.GetEntry(listBoxSources.SelectedIndex);
-                textBoxSourcePath.Text = entry.Source;
-                textBoxConfigPath.Text = entry.Config;
-                panelSelectedSourceEntry.Enabled = true;
-            }
-        }
-
-        private void textBoxAppPath_TextChanged(Object sender, EventArgs e)
-        {
-            errorProviderAppPath.Clear();
-            SetWarning(errorProviderAppPathWarning, textBoxAppPath, _configProvider.GetAppPath(), "App path is changed");
-        }
-
-        private void textBoxSourcePath_TextChanged(Object sender, EventArgs e)
-        {
-            errorProviderSourcePath.Clear();
-            if (listBoxSources.SelectedIndex == -1)
-                return;
-            String sourceValue =  IsNewEntrySelected() ? "" : _configProvider.GetEntry(listBoxSources.SelectedIndex).Source;
-            SetWarning(errorProviderSourcePathWarning, textBoxSourcePath, sourceValue, "Source path is changed");
-        }
-
-        private void textBoxConfigPath_TextChanged(object sender, EventArgs e)
+        private void buttonClearSourceEntry_Click(object sender, EventArgs e)
         {
             if (listBoxSources.SelectedIndex == -1)
                 return;
-            String sourceValue = IsNewEntrySelected() ? "" : _configProvider.GetEntry(listBoxSources.SelectedIndex).Config;
-            SetWarning(errorProviderConfigPathWarning, textBoxConfigPath, sourceValue, "Config path is changed");
+            bool isNewEntry = IsNewEntrySelected();
+            textBoxSourcePath.Text = isNewEntry ? "" : _configProvider.GetEntry(listBoxSources.SelectedIndex).Source;
+            textBoxConfigPath.Text = isNewEntry ? "" : _configProvider.GetEntry(listBoxSources.SelectedIndex).Config;
         }
 
+        // Utility methods
         private void PrepareToolTip()
         {
             toolTipController.SetToolTip(buttonAddSourceEntry, "Add");
@@ -190,52 +198,27 @@ namespace SourceCodeAnalysisVSExtensionDev.Config
             toolTipController.SetToolTip(buttonShowConfigDialog, "Show file selection dialog");
         }
 
-        private void SetError(ErrorProvider errorProvider, TextBox textBox, String errorText)
-        {
-            errorProvider.SetError(textBox, errorText);
-            errorProvider.SetIconPadding(textBox, 4);
-        }
-
-        private void SetWarning(ErrorProvider errorProvider, TextBox textBox, String sourceValue, String warningText)
-        {
-            if (String.Equals(textBox.Text, sourceValue))
-                errorProvider.Clear();
-            else
-                SetError(errorProvider, textBox, warningText);
-        }
-
-        private Boolean ValidateAppLocation(String appPath)
-        {
-            errorProviderAppPathWarning.Clear();
-            if (String.IsNullOrEmpty(appPath))
-            {
-                SetError(errorProviderAppPath, textBoxAppPath, "Empty app path");
-                return false;
-            }
-            return true;
-        }
-
-        private Boolean ValidateSourceEntry(String sourcePath, String configPath)
-        {
-            errorProviderSourcePathWarning.Clear();
-            errorProviderConfigPathWarning.Clear();
-            if (String.IsNullOrEmpty(sourcePath))
-            {
-                SetError(errorProviderSourcePath, textBoxSourcePath, "Empty source path");
-                return false;
-            }
-            return true;
-        }
-
         private void ClearAllErrorProviders()
         {
-            // error providers
             errorProviderAppPath.Clear();
             errorProviderSourcePath.Clear();
-            // warn providers
-            errorProviderAppPathWarning.Clear();
-            errorProviderSourcePathWarning.Clear();
-            errorProviderConfigPathWarning.Clear();
+        }
+
+        private Boolean IsGeneralConfigChanged()
+        {
+            OutputLevel outputLevel = (OutputLevel) comboBoxOutputLevel.SelectedItem;
+            return !String.Equals(textBoxAppPath.Text, _configProvider.GetAppPath()) || outputLevel != _configProvider.GetOutputLevel();
+        }
+
+        private Boolean IsSourceEntryChanged()
+        {
+            if (listBoxSources.SelectedIndex == -1)
+                return false;
+            if (IsNewEntrySelected())
+                return !String.IsNullOrEmpty(textBoxSourcePath.Text) || !String.IsNullOrEmpty(textBoxConfigPath.Text);
+            SourceEntry entry = _configProvider.GetEntry(listBoxSources.SelectedIndex);
+            return !String.Equals(textBoxSourcePath.Text, entry.Source) ||
+                   !String.Equals(textBoxConfigPath.Text, entry.Config);
         }
 
         private Boolean IsNewEntrySelected()

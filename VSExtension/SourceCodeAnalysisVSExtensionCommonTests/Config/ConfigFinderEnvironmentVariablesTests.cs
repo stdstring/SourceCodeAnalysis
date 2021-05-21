@@ -37,7 +37,7 @@ namespace SourceCodeAnalysisVSExtensionCommonTests.Config
                 new SourceEntry(someSubprojectPath, someSubprojectConfigPath),
                 new SourceEntry("C:\\OtherRepo", "C:\\Configs\\OtherRepoConfig")
             };
-            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", entries);
+            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", OutputLevel.Error, entries);
             Assert.AreEqual(someRepoConfigPath, ConfigFinder.FindConfig(configDataProvider, $"{SomeRepoEnvVariableValue}"));
             Assert.AreEqual("", ConfigFinder.FindConfig(configDataProvider, $"{SomeRepoEnvVariableValue}\\SomeProject"));
             Assert.AreEqual(someSubprojectConfigPath, ConfigFinder.FindConfig(configDataProvider, $"{SomeRepoEnvVariableValue}\\SomeProject\\SomeSubproject"));
@@ -62,7 +62,7 @@ namespace SourceCodeAnalysisVSExtensionCommonTests.Config
                 new SourceEntry(someSubprojectPath, someSubprojectConfigPath),
                 new SourceEntry("C:\\OtherRepo", "C:\\Configs\\OtherRepoConfig")
             };
-            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", entries);
+            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", OutputLevel.Error, entries);
             Assert.AreEqual("", ConfigFinder.FindConfig(configDataProvider, $"{SomeRepoEnvVariableValue}"));
             Assert.AreEqual("", ConfigFinder.FindConfig(configDataProvider, $"{SomeRepoEnvVariableValue}\\SomeProject"));
             Assert.AreEqual("", ConfigFinder.FindConfig(configDataProvider, $"{SomeRepoEnvVariableValue}\\SomeProject\\SomeSubproject"));
@@ -87,7 +87,7 @@ namespace SourceCodeAnalysisVSExtensionCommonTests.Config
                 new SourceEntry(someSubprojectPath, someSubprojectConfigPath),
                 new SourceEntry("C:\\OtherRepo", "C:\\Configs\\OtherRepoConfig")
             };
-            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", entries);
+            IConfigDataProvider configDataProvider = new ReadOnlyConfigDataProvider("C:\\AppSomeLocation", OutputLevel.Error, entries);
             Assert.AreEqual(someRepoConfigPath, ConfigFinder.FindConfig(configDataProvider, $"{SomeRepoEnvVariableValue}"));
             Assert.AreEqual("", ConfigFinder.FindConfig(configDataProvider, $"{SomeRepoEnvVariableValue}\\SomeProject"));
             Assert.AreEqual(someSubprojectConfigPath, ConfigFinder.FindConfig(configDataProvider, $"{SomeRepoEnvVariableValue}\\SomeProject\\SomeSubproject"));

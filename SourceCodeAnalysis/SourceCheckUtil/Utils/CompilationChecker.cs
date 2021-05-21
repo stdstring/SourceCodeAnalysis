@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.CodeAnalysis;
+using SourceCheckUtil.Output;
 
 namespace SourceCheckUtil.Utils
 {
@@ -9,34 +10,20 @@ namespace SourceCheckUtil.Utils
     {
         public static Boolean CheckCompilationErrors(String filename, Compilation compilation, OutputImpl output)
         {
-            output.WriteOutputLine("Checking compilation for errors, warnings and infos:");
+            output.WriteInfoLine("Checking compilation for errors and warnings:");
             IList<Diagnostic> diagnostics = compilation.GetDiagnostics();
-            /*IList<Diagnostic> declarationDiagnostics = compilation.GetDeclarationDiagnostics();
-            IList<Diagnostic> methodDiagnostics = compilation.GetMethodBodyDiagnostics();
-            IList<Diagnostic> parseDiagnostics = compilation.GetParseDiagnostics();*/
             Diagnostic[] diagnosticErrors = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
             Diagnostic[] diagnosticWarnings = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Warning).ToArray();
-            Diagnostic[] diagnosticInfos = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Info || d.Severity == DiagnosticSeverity.Hidden).ToArray();
             Boolean hasErrors = false;
-            output.WriteOutputLine($"Found {diagnosticErrors.Length} errors in the compilation");
+            output.WriteInfoLine($"Found {diagnosticErrors.Length} errors in the compilation");
             foreach (Diagnostic diagnostic in diagnosticErrors)
             {
-                output.WriteErrorLine($"[ERROR]: Found following error in the compilation of the {filename} entity: {diagnostic.GetMessage()}");
+                output.WriteErrorLine($"Found following error in the compilation of the {filename} entity: {diagnostic.GetMessage()}");
                 hasErrors = true;
             }
-            output.WriteOutputLine($"Found {diagnosticWarnings.Length} warnings in the compilation");
+            output.WriteInfoLine($"Found {diagnosticWarnings.Length} warnings in the compilation");
             foreach (Diagnostic diagnostic in diagnosticWarnings)
-            {
-                output.WriteOutputLine($"[WARNING]: Found following warning in the compilation: {diagnostic.GetMessage()}");
-            }
-            output.WriteOutputLine($"Found {diagnosticInfos.Length} info entries in the compilation");
-            foreach (Diagnostic diagnostic in diagnosticInfos)
-            {
-                output.WriteOutputLine($"Found following info entry in the compilation: {diagnostic.GetMessage()}");
-            }
-            if (diagnostics.Count == 0)
-                output.WriteOutputLine("No any errors, warnings and infos");
-            output.WriteOutputLine();
+                output.WriteWarningLine($"Found following warning in the compilation: {diagnostic.GetMessage()}");
             return !hasErrors;
         }
     }

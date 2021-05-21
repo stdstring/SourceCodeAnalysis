@@ -6,9 +6,10 @@ namespace SourceCodeAnalysisVSExtensionCommonTests.Config
 {
     internal class ReadOnlyConfigDataProvider : IConfigDataProvider
     {
-        public ReadOnlyConfigDataProvider(String appPath, IList<SourceEntry> entries)
+        public ReadOnlyConfigDataProvider(String appPath, OutputLevel outputLevel, IList<SourceEntry> entries)
         {
             _appPath = appPath;
+            _outputLevel = outputLevel;
             _entries = entries;
         }
 
@@ -18,6 +19,16 @@ namespace SourceCodeAnalysisVSExtensionCommonTests.Config
         }
 
         public void SaveAppPath(string appPath)
+        {
+            throw new NotSupportedException();
+        }
+
+        public OutputLevel GetOutputLevel()
+        {
+            return _outputLevel;
+        }
+
+        public void SaveOutputLevel(OutputLevel outputLevel)
         {
             throw new NotSupportedException();
         }
@@ -48,6 +59,7 @@ namespace SourceCodeAnalysisVSExtensionCommonTests.Config
         }
 
         private readonly String _appPath;
+        private readonly OutputLevel _outputLevel;
         private readonly IList<SourceEntry> _entries;
     }
 }

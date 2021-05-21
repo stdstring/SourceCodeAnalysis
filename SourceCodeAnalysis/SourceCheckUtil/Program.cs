@@ -4,8 +4,8 @@ using System.Text;
 using SourceCheckUtil.Analyzers;
 using SourceCheckUtil.Args;
 using SourceCheckUtil.Config;
+using SourceCheckUtil.Output;
 using SourceCheckUtil.Processors;
-using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil
 {
@@ -49,11 +49,11 @@ namespace SourceCheckUtil
                         Console.Error.WriteLine(BadConfigMessage);
                         return false;
                     }
-                    OutputImpl output = new OutputImpl(Console.Out, Console.Error, appArgs.Verbose);
+                    OutputImpl output = new OutputImpl(Console.Out, Console.Error, appArgs.OutputLevel);
                     ISourceProcessor processor = SourceProcessorFactory.Create(appArgs.Source, externalConfig, output);
                     IList<IFileAnalyzer> analyzers = AnalyzersFactory.Create(output);
                     Boolean processResult = processor.Process(analyzers);
-                    output.WriteOutputLine($"Result of analysis: analysis is {(processResult ? "succeeded" : "failed")}");
+                    output.WriteInfoLine($"Result of analysis: analysis is {(processResult ? "succeeded" : "failed")}");
                     return processResult;
                 case AppUsageMode.BadSource:
                     Console.Error.WriteLine(BadSourceMessage);
@@ -72,12 +72,14 @@ namespace SourceCheckUtil
         }
 
         private const String AppDescription = "Application usage:\r\n" +
-                                              "1. {APP} --source={solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config={config-file|config-dir}] [--verbose]\r\n" +
+                                              "1. {APP} --source={solution-filename.sln|project-filename.csproj|cs-filename.cs} [--config={config-file|config-dir}] [--output-level={Error|Warning|Info}]\r\n" +
                                               "2. {APP} --help\r\n" +
-                                              "3. {APP} --version";
+                                              "3. {APP} --version\r\n" +
+                                              "Default values:\r\n" +
+                                              "1. output-level=Error";
         private const String BadUsageMessage = "[ERROR]: Bad usage of the application.";
         private const String BadSourceMessage = "[ERROR]: Bad/empty/unknown source path.";
         private const String BadConfigMessage = "[ERROR]: Bad/empty/unknown config path.";
-        private const String VersionNumber = "0.2";
+        private const String VersionNumber = "0.9";
     }
 }

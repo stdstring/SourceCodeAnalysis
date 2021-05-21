@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Threading;
 using SourceCodeAnalysisVSExtensionCommon.Launcher;
+using SourceCodeAnalysisVSExtensionDev.Launcher;
 using Task = System.Threading.Tasks.Task;
 
 namespace SourceCodeAnalysisVSExtensionDev.Utils

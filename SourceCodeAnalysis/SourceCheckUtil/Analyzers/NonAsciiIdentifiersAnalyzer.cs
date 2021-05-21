@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using SourceCheckUtil.Config;
+using SourceCheckUtil.Output;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Analyzers
@@ -19,21 +20,20 @@ namespace SourceCheckUtil.Analyzers
 
         public Boolean Process(String filePath, SyntaxTree tree, SemanticModel model, ConfigData externalData)
         {
-            _output.WriteOutputLine($"Execution of NonAsciiIdentifiersAnalyzer started");
+            _output.WriteInfoLine($"Execution of NonAsciiIdentifiersAnalyzer started");
             Regex identifierRegex = new Regex("^[a-zA-Z0-9_]+$");
             NonConsistentIdentifiersDetector detector = new NonConsistentIdentifiersDetector(identifierRegex);
             detector.Visit(tree.GetRoot());
             Boolean hasErrors = ProcessErrors(filePath, detector.Data);
-            _output.WriteOutputLine($"Execution of NonAsciiIdentifiersAnalyzer finished");
-            _output.WriteOutputLine();
+            _output.WriteInfoLine($"Execution of NonAsciiIdentifiersAnalyzer finished");
             return !hasErrors;
         }
 
         private Boolean ProcessErrors(String filePath, IList<CollectedData<String>> errors)
         {
-            _output.WriteOutputLine($"Found {errors.Count} non-ASCII identifiers leading to errors in the ported C++ code");
+            _output.WriteInfoLine($"Found {errors.Count} non-ASCII identifiers leading to errors in the ported C++ code");
             foreach (CollectedData<String> error in errors)
-                _output.WriteErrorLine(filePath, error.StartPosition.Line, $"[ERROR]: Found non-ASCII identifier \"{error.Data}\"");
+                _output.WriteErrorLine(filePath, error.StartPosition.Line, $"Found non-ASCII identifier \"{error.Data}\"");
             return errors.Count > 0;
         }
 

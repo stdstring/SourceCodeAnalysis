@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using SourceCheckUtil.Analyzers;
-using SourceCheckUtil.Utils;
+using SourceCheckUtil.Output;
 using SourceCheckUtilTests.Utils;
 
 namespace SourceCheckUtilTests.Analyzers
@@ -9,8 +9,9 @@ namespace SourceCheckUtilTests.Analyzers
     [TestFixture]
     public class NonAsciiIdentifiersAnalyzerTests
     {
-        [Test]
-        public void ProcessNonAsciiIdentifiers()
+        [TestCase(OutputLevel.Error)]
+        [TestCase(OutputLevel.Warning)]
+        public void ProcessNonAsciiIdentifiers(OutputLevel outputLevel)
         {
             const String source = "namespace SomeНеймспейс\r\n" +
                                   "{\r\n" +
@@ -29,21 +30,21 @@ namespace SourceCheckUtilTests.Analyzers
                                   "    }\r\n" +
                                   "}";
             const String filePath = "C:\\SomeFolder\\SomeClass.cs";
-            const String expectedError = filePath + "(1): [ERROR]: Found non-ASCII identifier \"SomeНеймспейс\"\r\n" +
-                                         filePath + "(3): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n" +
-                                         filePath + "(6): [ERROR]: Found non-ASCII identifier \"SomeКласс\"\r\n" +
-                                         filePath + "(8): [ERROR]: Found non-ASCII identifier \"SomeМетод\"\r\n" +
-                                         filePath + "(10): [ERROR]: Found non-ASCII identifier \"intПеременная\"\r\n" +
-                                         filePath + "(11): [ERROR]: Found non-ASCII identifier \"строковаяVar1\"\r\n" +
-                                         filePath + "(13): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n" +
-                                         filePath + "(13): [ERROR]: Found non-ASCII identifier \"другойObj\"\r\n" +
-                                         filePath + "(13): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n";
-            Func<OutputImpl, IFileAnalyzer> analyzerFactory = output => new NonAsciiIdentifiersAnalyzer(output);
-            AnalyzerHelper.Process(analyzerFactory, source, "NonAsciiIdentifiers", filePath, false, false, "", expectedError);
+            const String expectedOutputTemplate = "{0}(1): [ERROR]: Found non-ASCII identifier \"SomeНеймспейс\"\r\n" +
+                                                  "{0}(3): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n" +
+                                                  "{0}(6): [ERROR]: Found non-ASCII identifier \"SomeКласс\"\r\n" +
+                                                  "{0}(8): [ERROR]: Found non-ASCII identifier \"SomeМетод\"\r\n" +
+                                                  "{0}(10): [ERROR]: Found non-ASCII identifier \"intПеременная\"\r\n" +
+                                                  "{0}(11): [ERROR]: Found non-ASCII identifier \"строковаяVar1\"\r\n" +
+                                                  "{0}(13): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n" +
+                                                  "{0}(13): [ERROR]: Found non-ASCII identifier \"другойObj\"\r\n" +
+                                                  "{0}(13): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n";
+            String expectedOutput = String.Format(expectedOutputTemplate, filePath);
+            AnalyzerHelper.Process(_analyzerFactory, source, "NonAsciiIdentifiers", filePath, outputLevel, false, expectedOutput);
         }
 
         [Test]
-        public void ProcessNonAsciiIdentifiersWithVerbose()
+        public void ProcessNonAsciiIdentifiersWithInfoLevel()
         {
             const String source = "namespace SomeНеймспейс\r\n" +
                                   "{\r\n" +
@@ -62,24 +63,25 @@ namespace SourceCheckUtilTests.Analyzers
                                   "    }\r\n" +
                                   "}";
             const String filePath = "C:\\SomeFolder\\SomeClass.cs";
-            const String expectedOutput = "Execution of NonAsciiIdentifiersAnalyzer started\r\n" +
-                                          "Found 9 non-ASCII identifiers leading to errors in the ported C++ code\r\n" +
-                                          "Execution of NonAsciiIdentifiersAnalyzer finished\r\n\r\n";
-            const String expectedError = filePath + "(1): [ERROR]: Found non-ASCII identifier \"SomeНеймспейс\"\r\n" +
-                                         filePath + "(3): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n" +
-                                         filePath + "(6): [ERROR]: Found non-ASCII identifier \"SomeКласс\"\r\n" +
-                                         filePath + "(8): [ERROR]: Found non-ASCII identifier \"SomeМетод\"\r\n" +
-                                         filePath + "(10): [ERROR]: Found non-ASCII identifier \"intПеременная\"\r\n" +
-                                         filePath + "(11): [ERROR]: Found non-ASCII identifier \"строковаяVar1\"\r\n" +
-                                         filePath + "(13): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n" +
-                                         filePath + "(13): [ERROR]: Found non-ASCII identifier \"другойObj\"\r\n" +
-                                         filePath + "(13): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n";
-            Func<OutputImpl, IFileAnalyzer> analyzerFactory = output => new NonAsciiIdentifiersAnalyzer(output);
-            AnalyzerHelper.Process(analyzerFactory, source, "NonAsciiIdentifiers", filePath, true, false, expectedOutput, expectedError);
+            const String expectedOutputTemplate = "Execution of NonAsciiIdentifiersAnalyzer started\r\n" +
+                                                  "Found 9 non-ASCII identifiers leading to errors in the ported C++ code\r\n" +
+                                                  "{0}(1): [ERROR]: Found non-ASCII identifier \"SomeНеймспейс\"\r\n" +
+                                                  "{0}(3): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n" +
+                                                  "{0}(6): [ERROR]: Found non-ASCII identifier \"SomeКласс\"\r\n" +
+                                                  "{0}(8): [ERROR]: Found non-ASCII identifier \"SomeМетод\"\r\n" +
+                                                  "{0}(10): [ERROR]: Found non-ASCII identifier \"intПеременная\"\r\n" +
+                                                  "{0}(11): [ERROR]: Found non-ASCII identifier \"строковаяVar1\"\r\n" +
+                                                  "{0}(13): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n" +
+                                                  "{0}(13): [ERROR]: Found non-ASCII identifier \"другойObj\"\r\n" +
+                                                  "{0}(13): [ERROR]: Found non-ASCII identifier \"ДругойClass\"\r\n" +
+                                                  "Execution of NonAsciiIdentifiersAnalyzer finished\r\n";
+            String expectedOutput = String.Format(expectedOutputTemplate, filePath);
+            AnalyzerHelper.Process(_analyzerFactory, source, "NonAsciiIdentifiers", filePath, OutputLevel.Info, false, expectedOutput);
         }
 
-        [Test]
-        public void ProcessAsciiIdentifiers()
+        [TestCase(OutputLevel.Error)]
+        [TestCase(OutputLevel.Warning)]
+        public void ProcessAsciiIdentifiers(OutputLevel outputLevel)
         {
             const String source = "namespace SomeNamespace\r\n" +
                                   "{\r\n" +
@@ -98,12 +100,11 @@ namespace SourceCheckUtilTests.Analyzers
                                   "    }\r\n" +
                                   "}";
             const String filePath = "C:\\SomeFolder\\SomeClass.cs";
-            Func<OutputImpl, IFileAnalyzer> analyzerFactory = output => new NonAsciiIdentifiersAnalyzer(output);
-            AnalyzerHelper.Process(analyzerFactory, source, "NonAsciiIdentifiers", filePath, false, true, "", "");
+            AnalyzerHelper.Process(_analyzerFactory, source, "NonAsciiIdentifiers", filePath, outputLevel, true, "");
         }
 
         [Test]
-        public void ProcessAsciiIdentifiersWithVerbose()
+        public void ProcessAsciiIdentifiersWithInfoLevel()
         {
             const String source = "namespace SomeNamespace\r\n" +
                                   "{\r\n" +
@@ -122,11 +123,9 @@ namespace SourceCheckUtilTests.Analyzers
                                   "    }\r\n" +
                                   "}";
             const String filePath = "C:\\SomeFolder\\SomeClass.cs";
-            const String expectedOutput = "Execution of NonAsciiIdentifiersAnalyzer started\r\n" +
-                                          "Found 0 non-ASCII identifiers leading to errors in the ported C++ code\r\n" +
-                                          "Execution of NonAsciiIdentifiersAnalyzer finished\r\n\r\n";
-            Func<OutputImpl, IFileAnalyzer> analyzerFactory = output => new NonAsciiIdentifiersAnalyzer(output);
-            AnalyzerHelper.Process(analyzerFactory, source, "NonAsciiIdentifiers", filePath, true, true, expectedOutput, "");
+            AnalyzerHelper.Process(_analyzerFactory, source, "NonAsciiIdentifiers", filePath, OutputLevel.Info, true, SourceCheckUtilOutputDef.NonAsciiIdentifiersAnalyzerSuccessOutput);
         }
+
+        private readonly Func<OutputImpl, IFileAnalyzer> _analyzerFactory = output => new NonAsciiIdentifiersAnalyzer(output);
     }
 }

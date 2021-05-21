@@ -91,7 +91,8 @@ namespace SourceCodeAnalysisVSExtensionDev
         {
             await OutputHelper.OutputMessageAsync(ServiceProvider, $"Source code analysis for solution named \"{target}\" is started");
             String configPath = ConfigFinder.FindConfig(configDataProvider, target);
-            ExecutionResult result = await ExecutionHelper.ExecuteSourceCodeAnalysisAsync(appPath, target, configPath);
+            OutputLevel outputLevel = configDataProvider.GetOutputLevel();
+            ExecutionResult result = await ExecutionHelper.ExecuteSourceCodeAnalysisAsync(appPath, target, configPath, outputLevel);
             await OutputHelper.OutputTargetAnalysisResultAsync(ServiceProvider, result, target, "solution");
             await OutputHelper.OutputMessageAsync(ServiceProvider, $"Source code analysis for solution named \"{target}\" is finished");
             await UIHelper.ShowSolutionSummaryAsync(_package, result, target);

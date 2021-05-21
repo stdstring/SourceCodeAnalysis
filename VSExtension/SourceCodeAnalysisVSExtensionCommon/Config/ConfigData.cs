@@ -4,11 +4,21 @@ using System.Xml.Serialization;
 
 namespace SourceCodeAnalysisVSExtensionCommon.Config
 {
-    [XmlRoot("AppConfig")]
-    public class AppData
+    public enum OutputLevel
     {
-        [XmlAttribute("path")]
+        Error = 0,
+        Warning = 1,
+        Info = 2
+    }
+
+    [XmlRoot("GeneralConfig")]
+    public class GeneralConfig
+    {
+        [XmlElement("AppPath")]
         public String AppPath { get; set; } = "";
+
+        [XmlElement("OutputLevel")]
+        public OutputLevel OutputLevel { get; set; } = OutputLevel.Error;
     }
 
     [XmlRoot("SourceConfigEntry")]
@@ -34,8 +44,8 @@ namespace SourceCodeAnalysisVSExtensionCommon.Config
     [XmlRoot("Config")]
     public class ConfigData
     {
-        [XmlElement("AppConfig")]
-        public AppData AppConfig { get; set; } = new AppData();
+        [XmlElement("GeneralConfig")]
+        public GeneralConfig GeneralConfig { get; set; } = new GeneralConfig();
 
         [XmlArray("SourceConfig")]
         [XmlArrayItem("SourceConfigEntry")]

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using SourceCheckUtil.Output;
 using SourceCheckUtil.Utils;
 
 namespace SourceCheckUtil.Args
@@ -26,12 +28,13 @@ namespace SourceCheckUtil.Args
                 return new AppArgs(AppUsageMode.Help);
             if (args.Length == 1 && String.Equals(args[0], VersionOption))
                 return new AppArgs(AppUsageMode.Version);
+            ISet<String> parsedOptions = new HashSet<String>();
             AppArgs appArgs = new AppArgs(AppUsageMode.Analysis);
             foreach (String arg in args)
             {
                 if (arg.StartsWith(SourceOption))
                 {
-                    if (!String.IsNullOrEmpty(appArgs.Source))
+                    if (!parsedOptions.Add(SourceOption))
                         return new AppArgs(AppUsageMode.BadSource);
                     String source = EnvironmentVariableHelper.ExpandEnvironmentVariables(arg.Substring(SourceOption.Length));
                     if (String.IsNullOrEmpty(source))
@@ -40,18 +43,20 @@ namespace SourceCheckUtil.Args
                 }
                 else if (arg.StartsWith(ConfigOption))
                 {
-                    if (!String.IsNullOrEmpty(appArgs.Config))
+                    if (!parsedOptions.Add(ConfigOption))
                         return new AppArgs(AppUsageMode.BadConfig);
                     String config = EnvironmentVariableHelper.ExpandEnvironmentVariables(arg.Substring(ConfigOption.Length));
                     if (String.IsNullOrEmpty(config))
                         return new AppArgs(AppUsageMode.BadConfig);
                     appArgs.Config = config;
                 }
-                else if (String.Equals(arg, VerboseOption))
+                else if (arg.StartsWith(OutputLevelOption))
                 {
-                    if (appArgs.Verbose)
+                    if (!parsedOptions.Add(OutputLevelOption))
                         return new AppArgs(AppUsageMode.BadAppUsage);
-                    appArgs.Verbose = true;
+                    if (!Enum.TryParse(arg.Substring(OutputLevelOption.Length), out OutputLevel outputLevel))
+                        return new AppArgs(AppUsageMode.BadAppUsage);
+                    appArgs.OutputLevel = outputLevel;
                 }
                 else
                     return new AppArgs(AppUsageMode.BadAppUsage);
@@ -63,6 +68,6 @@ namespace SourceCheckUtil.Args
         private const String VersionOption = "--version";
         private const String SourceOption = "--source=";
         private const String ConfigOption = "--config=";
-        private const String VerboseOption = "--verbose";
+        private const String OutputLevelOption = "--output-level=";
     }
 }

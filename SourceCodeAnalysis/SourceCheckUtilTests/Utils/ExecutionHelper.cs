@@ -4,21 +4,22 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using SourceCheckUtil.Output;
 
 namespace SourceCheckUtilTests.Utils
 {
     internal static class ExecutionHelper
     {
-        public static ExecutionResult Execute(String target, String config, Boolean verbose)
+        public static ExecutionResult Execute(String target, String config, OutputLevel outputLevel)
         {
-            return Execute(target, config, verbose, new Dictionary<String, String>());
+            return Execute(target, config, outputLevel, new Dictionary<String, String>());
         }
 
-        public static ExecutionResult Execute(String target, String config, Boolean verbose, IDictionary<String, String> environmentVariables)
+        public static ExecutionResult Execute(String target, String config, OutputLevel outputLevel, IDictionary<String, String> environmentVariables)
         {
             if (String.IsNullOrEmpty(target))
                 throw new ArgumentNullException(nameof(target));
-            String arguments = CreateArgList(target, config, verbose);
+            String arguments = CreateArgList(target, config, outputLevel);
             return Execute(arguments, environmentVariables);
         }
 
@@ -55,14 +56,13 @@ namespace SourceCheckUtilTests.Utils
             }
         }
 
-        private static String CreateArgList(String target, String config, Boolean verbose)
+        private static String CreateArgList(String target, String config, OutputLevel outputLevel)
         {
             StringBuilder dest = new StringBuilder();
             dest.AppendFormat("--source=\"{0}\"", target);
             if (!String.IsNullOrEmpty(config))
                 dest.AppendFormat(" --config=\"{0}\"", config);
-            if (verbose)
-                dest.Append(" --verbose");
+            dest.AppendFormat(" --output-level={0}", outputLevel);
             return dest.ToString();
         }
 

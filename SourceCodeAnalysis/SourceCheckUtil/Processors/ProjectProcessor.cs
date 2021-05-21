@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.MSBuild;
 using SourceCheckUtil.Analyzers;
 using SourceCheckUtil.Config;
-using SourceCheckUtil.Utils;
+using SourceCheckUtil.Output;
 
 namespace SourceCheckUtil.Processors
 {
@@ -26,30 +26,26 @@ namespace SourceCheckUtil.Processors
 
         public Boolean Process(IList<IFileAnalyzer> analyzers)
         {
-            _output.WriteOutputLine($"Processing of the project {_projectFilename} is started");
-            _output.WriteOutputLine();
+            _output.WriteInfoLine($"Processing of the project {_projectFilename} is started");
             MSBuildWorkspace workspace = MSBuildWorkspace.Create();
             if (!File.Exists(_projectFilename))
             {
-                _output.WriteErrorLine($"[ERROR]: Bad (unknown) target {_projectFilename}");
+                _output.WriteFailLine($"Bad (unknown) target {_projectFilename}");
                 return false;
             }
             Project project = workspace.OpenProjectAsync(_projectFilename).Result;
             Boolean result = _processorHelper.ProcessProject(project, analyzers, Process);
-            _output.WriteOutputLine($"Processing of the project {_projectFilename} is finished");
-            _output.WriteOutputLine();
+            _output.WriteInfoLine($"Processing of the project {_projectFilename} is finished");
             return result;
         }
 
         private Boolean Process(Document file, Compilation compilation, ConfigData externalData, IList<IFileAnalyzer> analyzers)
         {
-            _output.WriteOutputLine($"Processing of the file {file.FilePath} is started");
-            _output.WriteOutputLine();
+            _output.WriteInfoLine($"Processing of the file {file.FilePath} is started");
             SyntaxTree tree = file.GetSyntaxTreeAsync().Result;
             SemanticModel model = compilation.GetSemanticModel(tree);
             Boolean result = _processorHelper.ProcessFile(file.FilePath, tree, model, externalData, analyzers);
-            _output.WriteOutputLine($"Processing of the file {file.FilePath} is finished");
-            _output.WriteOutputLine();
+            _output.WriteInfoLine($"Processing of the file {file.FilePath} is finished");
             return result;
         }
 

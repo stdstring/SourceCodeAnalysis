@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Build.Locator;
 using SourceCheckUtil.Config;
-using SourceCheckUtil.Utils;
+using SourceCheckUtil.Output;
 
 namespace SourceCheckUtil.Processors
 {

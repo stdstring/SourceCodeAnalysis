@@ -1,4 +1,5 @@
 ﻿using System;
+using SourceCheckUtil.Output;
 
 namespace SourceCheckUtil.Args
 {
@@ -9,7 +10,6 @@ namespace SourceCheckUtil.Args
             Mode = mode;
             Source = null;
             Config = null;
-            Verbose = VerboseDefaultValue;
         }
 
         public AppUsageMode Mode { get; }
@@ -18,8 +18,6 @@ namespace SourceCheckUtil.Args
 
         public String Config { get; set; }
 
-        public Boolean Verbose { get; set; }
-
-        public const Boolean VerboseDefaultValue = false;
+        public OutputLevel OutputLevel { get; set; } = OutputLevel.Error;
     }
 }

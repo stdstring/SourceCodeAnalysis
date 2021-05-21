@@ -43,7 +43,6 @@
   <ItemGroup>
     <Compile Include="CastsExample.cs" />
     <Compile Include="ClassNameExample.cs" />
-    <Compile Include="CppVirtualInheritance.cs" />
     <Compile Include="IdentifiersExample.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
